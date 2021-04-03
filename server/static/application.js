@@ -5130,7 +5130,11 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
-}var $elm$core$List$cons = _List_cons;
+}var $elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
+var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
 	function (func, baseCase, _v0) {
@@ -5233,10 +5237,6 @@ var $elm$json$Json$Decode$OneOf = function (a) {
 };
 var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Basics$add = _Basics_add;
-var $elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -10906,7 +10906,10 @@ var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
 			[state]);
 	});
 var $author$project$Global$Route$route = A2($elm$url$Url$Parser$map, $author$project$Global$Route$Root, $elm$url$Url$Parser$top);
-var $author$project$Page$SignIn$Route$Root = {$: 'Root'};
+var $author$project$Page$Gallery$Route$Root = {$: 'Root'};
+var $author$project$Page$Gallery$Route$Show = function (a) {
+	return {$: 'Show', a: a};
+};
 var $elm$url$Url$Parser$s = function (str) {
 	return $elm$url$Url$Parser$Parser(
 		function (_v0) {
@@ -10933,10 +10936,75 @@ var $elm$url$Url$Parser$s = function (str) {
 			}
 		});
 };
+var $elm$url$Url$Parser$slash = F2(
+	function (_v0, _v1) {
+		var parseBefore = _v0.a;
+		var parseAfter = _v1.a;
+		return $elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					$elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var $elm$url$Url$Parser$custom = F2(
+	function (tipe, stringToSomething) {
+		return $elm$url$Url$Parser$Parser(
+			function (_v0) {
+				var visited = _v0.visited;
+				var unvisited = _v0.unvisited;
+				var params = _v0.params;
+				var frag = _v0.frag;
+				var value = _v0.value;
+				if (!unvisited.b) {
+					return _List_Nil;
+				} else {
+					var next = unvisited.a;
+					var rest = unvisited.b;
+					var _v2 = stringToSomething(next);
+					if (_v2.$ === 'Just') {
+						var nextValue = _v2.a;
+						return _List_fromArray(
+							[
+								A5(
+								$elm$url$Url$Parser$State,
+								A2($elm$core$List$cons, next, visited),
+								rest,
+								params,
+								frag,
+								value(nextValue))
+							]);
+					} else {
+						return _List_Nil;
+					}
+				}
+			});
+	});
+var $elm$url$Url$Parser$string = A2($elm$url$Url$Parser$custom, 'STRING', $elm$core$Maybe$Just);
+var $author$project$Page$Gallery$Route$route = A2(
+	$elm$url$Url$Parser$slash,
+	$elm$url$Url$Parser$s('gallery'),
+	$elm$url$Url$Parser$oneOf(
+		_List_fromArray(
+			[
+				A2(
+				$elm$url$Url$Parser$map,
+				$author$project$Page$Gallery$Route$Show,
+				A2($elm$url$Url$Parser$slash, $elm$url$Url$Parser$top, $elm$url$Url$Parser$string)),
+				A2($elm$url$Url$Parser$map, $author$project$Page$Gallery$Route$Root, $elm$url$Url$Parser$top)
+			])));
+var $author$project$Page$SignIn$Route$Root = {$: 'Root'};
 var $author$project$Page$SignIn$Route$route = A2(
 	$elm$url$Url$Parser$map,
 	$author$project$Page$SignIn$Route$Root,
 	$elm$url$Url$Parser$s('signin'));
+var $author$project$App$Route$Gallery = function (a) {
+	return {$: 'Gallery', a: a};
+};
+var $author$project$App$Router$transformGallery = function (r) {
+	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Gallery, r);
+};
 var $author$project$App$Router$transformGlobal = function (r) {
 	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Global, r);
 };
@@ -10950,6 +11018,7 @@ var $author$project$App$Router$routeParser = $elm$url$Url$Parser$oneOf(
 	_List_fromArray(
 		[
 			$author$project$App$Router$transformSignIn($author$project$Page$SignIn$Route$route),
+			$author$project$App$Router$transformGallery($author$project$Page$Gallery$Route$route),
 			$author$project$App$Router$transformGlobal($author$project$Global$Route$route)
 		]));
 var $author$project$App$Router$parsedUrl = function (url) {
@@ -10958,30 +11027,65 @@ var $author$project$App$Router$parsedUrl = function (url) {
 		$author$project$App$Route$Global($author$project$Global$Route$NotFound),
 		A2($elm$url$Url$Parser$parse, $author$project$App$Router$routeParser, url));
 };
-var $author$project$Global$Model$initialModel = F2(
-	function (key, url) {
+var $author$project$Global$Model$initialModel = F3(
+	function (flags, key, url) {
 		return {
-			jwtToken: $elm$core$Maybe$Nothing,
+			jwtToken: flags.jwt,
 			navigationKey: key,
 			page: $author$project$App$Router$parsedUrl(url)
 		};
 	});
+var $author$project$Page$Gallery$Model$initialModel = {error: $elm$core$Maybe$Nothing, objectList: $elm$core$Maybe$Nothing, path: ''};
 var $author$project$Page$SignIn$Model$initialModel = {error: false, name: '', token: ''};
 var $author$project$App$Model$initialModel = F3(
-	function (_v0, key, url) {
+	function (flags, key, url) {
 		return {
-			global: A2($author$project$Global$Model$initialModel, key, url),
+			gallery: $author$project$Page$Gallery$Model$initialModel,
+			global: A3($author$project$Global$Model$initialModel, flags, key, url),
 			signIn: $author$project$Page$SignIn$Model$initialModel
 		};
 	});
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $author$project$App$Route$redirectCommand = F3(
+	function (page, nav, jwt) {
+		if (jwt.$ === 'Just') {
+			_v1$3:
+			while (true) {
+				switch (page.$) {
+					case 'Gallery':
+						return $elm$core$Platform$Cmd$none;
+					case 'Global':
+						switch (page.a.$) {
+							case 'NotFound':
+								var _v2 = page.a;
+								return $elm$core$Platform$Cmd$none;
+							case 'SomethingWentWrong':
+								return $elm$core$Platform$Cmd$none;
+							default:
+								break _v1$3;
+						}
+					default:
+						break _v1$3;
+				}
+			}
+			return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/gallery');
+		} else {
+			if (page.$ === 'SignIn') {
+				return $elm$core$Platform$Cmd$none;
+			} else {
+				return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/signin');
+			}
+		}
+	});
 var $author$project$App$Init$init = F3(
 	function (flags, url, key) {
-		return _Utils_Tuple2(
-			A3($author$project$App$Model$initialModel, flags, key, url),
-			$elm$core$Platform$Cmd$none);
+		var model = A3($author$project$App$Model$initialModel, flags, key, url);
+		var command = A3($author$project$App$Route$redirectCommand, model.global.page, model.global.navigationKey, model.global.jwtToken);
+		return _Utils_Tuple2(model, command);
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $author$project$App$Message$Global = function (a) {
 	return {$: 'Global', a: a};
 };
@@ -10999,9 +11103,9 @@ var $author$project$App$Router$onUrlRequest = function (request) {
 	return $author$project$App$Message$Global(
 		$author$project$Global$Message$UrlRequest(request));
 };
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $author$project$App$Message$NoOp = {$: 'NoOp'};
 var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -11091,10 +11195,9 @@ var $author$project$Global$Update$update = F2(
 			}
 		}
 	});
-var $author$project$Page$SignIn$Message$LoginResponse = function (a) {
-	return {$: 'LoginResponse', a: a};
+var $author$project$Page$Gallery$Message$ObjectListArrived = function (a) {
+	return {$: 'ObjectListArrived', a: a};
 };
-var $author$project$App$Port$saveToken = _Platform_outgoingPort('saveToken', $elm$json$Json$Encode$string);
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
 		return {$: 'BadStatus_', a: a, b: b};
@@ -11122,6 +11225,7 @@ var $elm$core$Maybe$isJust = function (maybe) {
 	}
 };
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -11188,33 +11292,21 @@ var $elm$http$Http$expectJson = F2(
 						A2($elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
-var $elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2($elm$json$Json$Encode$encode, 0, value));
-};
-var $author$project$Page$SignIn$Token$Token = F2(
+var $elm$http$Http$Header = F2(
 	function (a, b) {
-		return {$: 'Token', a: a, b: b};
+		return {$: 'Header', a: a, b: b};
 	});
-var $author$project$Page$SignIn$Update$loginDecoder = A3(
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $author$project$Page$Gallery$Model$Object = F2(
+	function (key, type_) {
+		return {key: key, type_: type_};
+	});
+var $author$project$Page$Gallery$Request$objectDecoder = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Page$SignIn$Token$Token,
-	A2($elm$json$Json$Decode$field, 'Token', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'Error', $elm$json$Json$Decode$string));
-var $author$project$Page$SignIn$Update$loginEncoder = function (model) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'Token',
-				$elm$json$Json$Encode$string(model.token)),
-				_Utils_Tuple2(
-				'Username',
-				$elm$json$Json$Encode$string(model.name))
-			]));
-};
+	$author$project$Page$Gallery$Model$Object,
+	A2($elm$json$Json$Decode$field, 'Key', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'Type', $elm$json$Json$Decode$string));
+var $author$project$Page$Gallery$Request$objectListDecoder = $elm$json$Json$Decode$list($author$project$Page$Gallery$Request$objectDecoder);
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -11365,6 +11457,101 @@ var $elm$http$Http$request = function (r) {
 		$elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
+var $author$project$Page$Gallery$Request$objectsOnPath = F3(
+	function (jwt, model, msg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$emptyBody,
+				expect: A2($elm$http$Http$expectJson, msg, $author$project$Page$Gallery$Request$objectListDecoder),
+				headers: _List_fromArray(
+					[
+						A2(
+						$elm$http$Http$header,
+						'JWT-TOKEN',
+						A2($elm$core$Maybe$withDefault, '', jwt))
+					]),
+				method: 'GET',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: '/api/list' + model.path
+			});
+	});
+var $author$project$App$Message$Gallery = function (a) {
+	return {$: 'Gallery', a: a};
+};
+var $author$project$Page$Gallery$Request$wrapMsg = F2(
+	function (msg, param) {
+		return $author$project$App$Message$Gallery(
+			msg(param));
+	});
+var $author$project$Page$Gallery$Update$update = F3(
+	function (msg, global, model) {
+		var _v0 = model.objectList;
+		if (_v0.$ === 'Nothing') {
+			if ((msg.$ === 'Gallery') && (msg.a.$ === 'ObjectListArrived')) {
+				var response = msg.a.a;
+				if (response.$ === 'Ok') {
+					var list = response.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								objectList: $elm$core$Maybe$Just(list)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('something went wrong')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			} else {
+				return _Utils_Tuple2(
+					model,
+					A3(
+						$author$project$Page$Gallery$Request$objectsOnPath,
+						global.global.jwtToken,
+						model,
+						$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived)));
+			}
+		} else {
+			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Page$SignIn$Message$LoginResponse = function (a) {
+	return {$: 'LoginResponse', a: a};
+};
+var $author$project$App$Port$saveToken = _Platform_outgoingPort('saveToken', $elm$json$Json$Encode$string);
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $author$project$Page$SignIn$Token$Token = F2(
+	function (a, b) {
+		return {$: 'Token', a: a, b: b};
+	});
+var $author$project$Page$SignIn$Update$loginDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Page$SignIn$Token$Token,
+	A2($elm$json$Json$Decode$field, 'Token', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'Error', $elm$json$Json$Decode$string));
+var $author$project$Page$SignIn$Update$loginEncoder = function (model) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'Token',
+				$elm$json$Json$Encode$string(model.token)),
+				_Utils_Tuple2(
+				'Username',
+				$elm$json$Json$Encode$string(model.name))
+			]));
+};
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
 		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
@@ -11393,22 +11580,25 @@ var $author$project$Page$SignIn$Update$update = F3(
 			switch (msg.a.$) {
 				case 'NameInput':
 					var value = msg.a.a;
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						_Utils_update(
 							model,
 							{name: value}),
+						$elm$core$Maybe$Nothing,
 						$elm$core$Platform$Cmd$none);
 				case 'TokenInput':
 					var value = msg.a.a;
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						_Utils_update(
 							model,
 							{token: value}),
+						$elm$core$Maybe$Nothing,
 						$elm$core$Platform$Cmd$none);
 				case 'SubmitForm':
 					var _v1 = msg.a;
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						$author$project$Page$SignIn$Model$initialModel,
+						$elm$core$Maybe$Nothing,
 						A2(
 							$author$project$Page$SignIn$Update$sendLoginForm,
 							model,
@@ -11418,8 +11608,9 @@ var $author$project$Page$SignIn$Update$update = F3(
 					if ((response.$ === 'Ok') && (response.a.b === '')) {
 						var _v3 = response.a;
 						var token = _v3.a;
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							model,
+							$elm$core$Maybe$Just(token),
 							$elm$core$Platform$Cmd$batch(
 								_List_fromArray(
 									[
@@ -11427,31 +11618,51 @@ var $author$project$Page$SignIn$Update$update = F3(
 										A2($elm$browser$Browser$Navigation$pushUrl, global.global.navigationKey, '/')
 									])));
 					} else {
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							_Utils_update(
 								model,
 								{error: true}),
+							$elm$core$Maybe$Nothing,
 							$elm$core$Platform$Cmd$none);
 					}
 			}
 		} else {
-			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			return _Utils_Tuple3(model, $elm$core$Maybe$Nothing, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$App$Update$update = F2(
 	function (msg, model) {
 		var _v0 = A3($author$project$Page$SignIn$Update$update, msg, model, model.signIn);
 		var signInModel = _v0.a;
-		var signInCmd = _v0.b;
+		var newToken = _v0.b;
+		var signInCmd = _v0.c;
+		var jwt = function () {
+			if (newToken.$ === 'Just') {
+				var token = newToken.a;
+				return $elm$core$Maybe$Just(token);
+			} else {
+				return model.global.jwtToken;
+			}
+		}();
 		var _v1 = A2($author$project$Global$Update$update, msg, model.global);
 		var globalModel = _v1.a;
 		var globalCmd = _v1.b;
-		var finalCmds = $elm$core$Platform$Cmd$batch(
-			_List_fromArray(
-				[globalCmd, signInCmd]));
+		var _v2 = A3($author$project$Page$Gallery$Update$update, msg, model, model.gallery);
+		var galleryModel = _v2.a;
+		var galleryCmd = _v2.b;
 		var finalModel = _Utils_update(
 			model,
-			{global: globalModel, signIn: signInModel});
+			{
+				gallery: galleryModel,
+				global: _Utils_update(
+					globalModel,
+					{jwtToken: jwt}),
+				signIn: signInModel
+			});
+		var command = A3($author$project$App$Route$redirectCommand, finalModel.global.page, finalModel.global.navigationKey, finalModel.global.jwtToken);
+		var finalCmds = $elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[command, globalCmd, galleryCmd, signInCmd]));
 		return _Utils_Tuple2(finalModel, finalCmds);
 	});
 var $elm$html$Html$strong = _VirtualDom_node('strong');
@@ -11508,6 +11719,32 @@ var $author$project$Global$View$view = F2(
 								]);
 					}
 				}())
+			]);
+	});
+var $author$project$Page$Gallery$View$view = F2(
+	function (_v0, model) {
+		return _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('breadcrumb')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(model.gallery.path)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('file-list')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('---')
+					]))
 			]);
 	});
 var $author$project$Page$SignIn$Message$NameInput = function (a) {
@@ -11597,12 +11834,16 @@ var $author$project$App$View$view = function (model) {
 					]),
 				function () {
 					var _v0 = model.global.page;
-					if (_v0.$ === 'Global') {
-						var page = _v0.a;
-						return A2($author$project$Global$View$view, page, model);
-					} else {
-						var page = _v0.a;
-						return A2($author$project$Page$SignIn$View$view, page, model);
+					switch (_v0.$) {
+						case 'Global':
+							var page = _v0.a;
+							return A2($author$project$Global$View$view, page, model);
+						case 'Gallery':
+							var page = _v0.a;
+							return A2($author$project$Page$Gallery$View$view, page, model);
+						default:
+							var page = _v0.a;
+							return A2($author$project$Page$SignIn$View$view, page, model);
 					}
 				}())
 			]),
@@ -11628,4 +11869,12 @@ _Platform_export({'Main':{'init':$author$project$Main$main(
 			return $elm$json$Json$Decode$succeed(
 				{jwt: jwt});
 		},
-		A2($elm$json$Json$Decode$field, 'jwt', $elm$json$Json$Decode$string)))({"versions":{"elm":"0.19.1"},"types":{"message":"App.Message.Message","aliases":{"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"App.Message.Message":{"args":[],"tags":{"NoOp":[],"Global":["Global.Message.Message"],"SignIn":["Page.SignIn.Message.Message"]}},"Global.Message.Message":{"args":[],"tags":{"NavigateTo":["String.String"],"UrlChanged":["Url.Url"],"UrlRequest":["Browser.UrlRequest"]}},"Page.SignIn.Message.Message":{"args":[],"tags":{"NameInput":["String.String"],"TokenInput":["String.String"],"SubmitForm":[],"LoginResponse":["Result.Result Http.Error Page.SignIn.Token.Token"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Page.SignIn.Token.Token":{"args":[],"tags":{"Token":["String.String","String.String"]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}}}}})}});}(this));
+		A2(
+			$elm$json$Json$Decode$field,
+			'jwt',
+			$elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+						A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+					])))))({"versions":{"elm":"0.19.1"},"types":{"message":"App.Message.Message","aliases":{"Page.Gallery.Model.Object":{"args":[],"type":"{ key : String.String, type_ : String.String }"},"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"App.Message.Message":{"args":[],"tags":{"NoOp":[],"Global":["Global.Message.Message"],"SignIn":["Page.SignIn.Message.Message"],"Gallery":["Page.Gallery.Message.Message"]}},"Global.Message.Message":{"args":[],"tags":{"NavigateTo":["String.String"],"UrlChanged":["Url.Url"],"UrlRequest":["Browser.UrlRequest"]}},"Page.Gallery.Message.Message":{"args":[],"tags":{"NoOp":[],"ObjectListArrived":["Result.Result Http.Error (List.List Page.Gallery.Model.Object)"]}},"Page.SignIn.Message.Message":{"args":[],"tags":{"NameInput":["String.String"],"TokenInput":["String.String"],"SubmitForm":[],"LoginResponse":["Result.Result Http.Error Page.SignIn.Token.Token"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"List.List":{"args":["a"],"tags":{}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Page.SignIn.Token.Token":{"args":[],"tags":{"Token":["String.String","String.String"]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}}}}})}});}(this));

@@ -13,6 +13,7 @@ import Url.Parser as Parser
 import App.Route as Route
 import App.Message as Message
 import Page.SignIn.Route as PageSignIn
+import Page.Gallery.Route as PageGallery
 import Global.Route as GlobalRoute
 import Global.Message
 
@@ -20,6 +21,7 @@ routeParser : Parser.Parser (Route.Route -> a) a
 routeParser =
     Parser.oneOf <|
         [ transformSignIn PageSignIn.route
+        , transformGallery PageGallery.route
         , transformGlobal GlobalRoute.route
         ]
 
@@ -42,3 +44,6 @@ transformGlobal r = Parser.map Route.Global r
 
 transformSignIn : Parser.Parser (PageSignIn.Route -> Route.Route) b -> Parser.Parser (b -> c) c
 transformSignIn r = Parser.map Route.SignIn r
+
+transformGallery : Parser.Parser (PageGallery.Route -> Route.Route) b -> Parser.Parser (b -> c) c
+transformGallery r = Parser.map Route.Gallery r

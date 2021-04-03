@@ -2,7 +2,9 @@ module App.Update exposing (..)
 
 import App.Message as Message
 import App.Model as Model
+import App.Route
 import Global.Update
+import Page.Gallery.Update
 import Page.SignIn.Update
 
 
@@ -12,8 +14,9 @@ update msg model =
         ( globalModel, globalCmd ) =
             Global.Update.update msg model.global
 
-        -- ( mainPageModel, mainPageCmd ) =
-        --     Page.Main.Update.update msg model.mainPage
+        ( galleryModel, galleryCmd ) =
+            Page.Gallery.Update.update msg model model.gallery
+
         ( signInModel, newToken, signInCmd ) =
             Page.SignIn.Update.update msg model model.signIn
 
@@ -29,9 +32,11 @@ update msg model =
             { model
                 | global = { globalModel | jwtToken = jwt }
                 , signIn = signInModel
+                , gallery = galleryModel
             }
 
+        command = App.Route.redirectCommand finalModel.global.page finalModel.global.navigationKey finalModel.global.jwtToken
         finalCmds =
-            Cmd.batch [ globalCmd, signInCmd ]
+            Cmd.batch [ command, globalCmd, galleryCmd, signInCmd ]
     in
     ( finalModel, finalCmds )

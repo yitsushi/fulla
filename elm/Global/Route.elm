@@ -8,6 +8,7 @@ type Route
     | Root
     | SomethingWentWrong ( Int, String )
 
+
 route : Parser.Parser (Route -> a) a
 route =
     Parser.map Root Parser.top

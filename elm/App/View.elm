@@ -8,6 +8,7 @@ import Global.View
 import Html
 import Html.Attributes
 import Page.SignIn.View
+import Page.Gallery.View
 
 
 view : Model.Model -> Document Message.Message
@@ -19,6 +20,9 @@ view model =
             (case model.global.page of
                 App.Route.Global page ->
                     Global.View.view page model
+
+                App.Route.Gallery page ->
+                    Page.Gallery.View.view page model
 
                 App.Route.SignIn page ->
                     Page.SignIn.View.view page model
