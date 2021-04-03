@@ -42,14 +42,26 @@ elm-dev-build: ## build elm [dev]
 	elm make elm/Main.elm --output=public/application.js --debug
 
 .PHONY: prod-build
-elm-dev-build: ## build elm [prod]
+elm-prod-build: ## build elm [prod]
 	$(call print-target)
 	elm make elm/Main.elm --output=public/application.js
 
+.PHONY: release
+release: ## goreleaser --rm-dist
+release: elm-prod-build
+	$(call print-target)
+	goreleaser --rm-dist
+
 .PHONY: build-snapshot
 build-snapshot: ## goreleaser --snapshot --skip-publish --rm-dist
+build-snapshot: elm-dev-build
 	$(call print-target)
-	goreleaser build --snapshot --rm-dist 
+	goreleaser build --snapshot --rm-dist
+
+.PHONY: go-clean
+go-clean: ## go clean build, test and modules caches
+	$(call print-target)
+	go clean -cache -testcache -modcache
 
 .PHONY: help
 help:
