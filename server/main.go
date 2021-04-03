@@ -1,16 +1,20 @@
 package server
 
 import (
+	"crypto/sha512"
 	"embed"
+	"encoding/base64"
 	"io/fs"
 	"net/http"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 
 	"gitea.code-infection.com/efertone/fulla/api"
 )
@@ -24,7 +28,16 @@ var staticFiles embed.FS
 func Serve(listen string) error {
 	app := fiber.New()
 
-	app.Use(csrf.New())
+	if os.Getenv("FULLA_LOGIN_SECRET") == "" {
+		logrus.Error("FULLA_LOGIN_SECRET is not defined!")
+
+		generatedSecret := generateRandomSecret()
+
+		os.Setenv("FULLA_LOGIN_SECRET", generatedSecret)
+		logrus.Errorf("Generated FULLA_LOGIN_SECRET is '%s'", generatedSecret)
+	}
+
+	// app.Use(csrf.New())
 	app.Use(requestid.New())
 	app.Use(compress.New())
 	app.Use(logger.New(logger.Config{
@@ -47,4 +60,13 @@ func Serve(listen string) error {
 	}))
 
 	return app.Listen(listen)
+}
+
+func generateRandomSecret() string {
+	randomUUID := uuid.Must(uuid.NewRandom()).String()
+	hash := sha512.New()
+
+	hash.Write([]byte(randomUUID))
+
+	return base64.URLEncoding.EncodeToString(hash.Sum(nil))
 }

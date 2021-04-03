@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Fulla</title>
-  <link rel="stylesheet" href="static/application.css">
-  <script type="text/javascript" src="static/application.js"></script>
+  <link rel="stylesheet" href="/static/application.css">
+  <script type="text/javascript" src="/static/application.js"></script>
 </head>
 
 <body>
@@ -19,6 +19,8 @@
       node: document.getElementById('elm'),
       flags: {}
     });
+
+    app.ports.saveToken.subscribe(token => localStorage.setItem("jwtToken", token))
   </script>
 
 </body>

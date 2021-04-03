@@ -5,6 +5,65 @@ html {
   color: #ccc;
 }
 
+a.go-to-gallery {
+  display: block;
+  width: 300px;
+  padding: 1em 2em;
+  text-align: center;
+  margin: 4em auto;
+  color: #ccc;
+  font-size: 2em;
+  background-color: #262626;
+  border-radius: 5px;
+}
+
+a.go-to-gallery:hover {
+  background-color: #266626;
+}
+
+.signin-box {
+  width: 300px;
+  margin: auto;
+  padding: 2em;
+  border-radius: 0.3em;
+  background-color: #363636;
+}
+
+.signin-box > input {
+  display: block;
+  padding: 1em;
+  width: 90%;
+  margin: 1em auto;
+  border: 3px solid transparent;
+  border-radius: 0.2em;
+}
+
+.signin-box > input:focus {
+  border-color: #0a0;
+  border-width: 3px;
+}
+
+.signin-box > button {
+  display: block;
+  padding: 1em;
+  width: 50%;
+  margin: 1em auto;
+  border: 1px solid black;
+  border-radius: 0.2em;
+  background-color: #ccc;
+}
+
+.signin-box > button:hover {
+  background-color: #cdc;
+  cursor: pointer;
+}
+
+img.nope {
+  width: 256px;
+  margin: 2em auto;
+  display: block;
+}
+
 footer > a {
   font-size: 0.8em;
   margin-left: 1em;

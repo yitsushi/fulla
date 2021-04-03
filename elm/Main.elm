@@ -1,6 +1,11 @@
 module Main exposing (..)
 
-import Html
+import App.Main
+import App.Flags exposing (Flags)
+import App.Model exposing (Model)
+import App.Message exposing (Message)
 
-main : Html.Html msg
-main = Html.text "booo"
+
+main : Program Flags Model Message
+main =
+    App.Main.main
