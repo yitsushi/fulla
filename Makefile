@@ -44,7 +44,7 @@ elm-dev-build: ## build elm [dev]
 .PHONY: prod-build
 elm-prod-build: ## build elm [prod]
 	$(call print-target)
-	elm make elm/Main.elm --output=public/application.js
+	elm make elm/Main.elm --output=server/public/static/application.js
 
 .PHONY: release
 release: ## goreleaser --rm-dist
@@ -57,6 +57,12 @@ build-snapshot: ## goreleaser --snapshot --skip-publish --rm-dist
 build-snapshot: elm-dev-build
 	$(call print-target)
 	goreleaser build --snapshot --rm-dist
+
+.PHONY: run-dev
+run-dev: ## build elm dev + go run :9876
+run-dev: elm-dev-build
+	$(call print-target)
+	go run . serve --listen="0.0.0.0:9876"
 
 .PHONY: go-clean
 go-clean: ## go clean build, test and modules caches

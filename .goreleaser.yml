@@ -1,12 +1,12 @@
 before:
   hooks:
-    - go mod download 
+    - go mod download
 builds:
 - main: .
   env:
     - CGO_ENABLED=0
   goos:
-    - darwin
+#    - darwin
     - linux
   goarch:
     - amd64
@@ -16,4 +16,4 @@ release:
     name: fulla
 gitea_urls:
   api: https://gitea.code-infection.com/api/v1/
-  download: https://gitea.code-infection.com 
+  download: https://gitea.code-infection.com
