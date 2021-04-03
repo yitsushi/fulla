@@ -49,7 +49,7 @@ elm-dev-build: ## build elm [prod]
 .PHONY: build-snapshot
 build-snapshot: ## goreleaser --snapshot --skip-publish --rm-dist
 	$(call print-target)
-	goreleaser --snapshot --skip-publish --rm-dist 
+	goreleaser build --snapshot --rm-dist 
 
 .PHONY: help
 help:

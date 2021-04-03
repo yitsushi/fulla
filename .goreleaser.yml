@@ -1,0 +1,19 @@
+before:
+  hooks:
+    - go mod download 
+builds:
+- main: .
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+    - linux
+  goarch:
+    - amd64
+release:
+  gitea:
+    owner: efertone
+    name: fulla
+gitea_urls:
+  api: https://gitea.code-infection.com/api/v1/
+  download: https://gitea.code-infection.com 
