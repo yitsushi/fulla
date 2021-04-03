@@ -1,0 +1,11 @@
+{
+  "go.useLanguageServer": true,
+  "gopls": {
+      "gofumpt": true,
+      "formatting.local": "gitea.code-infection.com/efertone/fulla"
+  },
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": [
+      "--fast"
+  ]
+}

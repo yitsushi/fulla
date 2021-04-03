@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fulla</title>
+  <link rel="stylesheet" href="application.css">
+  <script type="text/javascript" src="application.js"></script>
+</head>
+
+<body>
+
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <div id="elm"></div>
+
+  <script>
+    const app = Elm.Main.init({
+      node: document.getElementById('elm'),
+      flags:
+        { debug: true
+        , withDownload: true
+        , extentions:
+          [ { extention: "mkv", mime: "video/x-matroska" }
+          , { extention: "mp4", mime: "video/mp4" }
+          ]
+        }
+    });
+
+    app.ports.reloadVideoSource.subscribe(function() {
+      document.querySelector("video").load();
+    });
+  </script>
+
+</body>
+
+</html>
