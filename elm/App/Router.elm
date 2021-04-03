@@ -40,11 +40,5 @@ onUrlChange url =
 transformGlobal : Parser.Parser (GlobalRoute.Route -> Route.Route) b -> Parser.Parser (b -> c) c
 transformGlobal r = Parser.map Route.Global r
 
--- transformAdventOfCode : Parser.Parser (PageAoC.Route -> Route.Route) b -> Parser.Parser (b -> c) c
--- transformAdventOfCode r = Parser.map Route.AdventOfCode r
-
 transformSignIn : Parser.Parser (PageSignIn.Route -> Route.Route) b -> Parser.Parser (b -> c) c
 transformSignIn r = Parser.map Route.SignIn r
-
--- transformRoute : Route.Route -> Parser.Parser (a -> Route.Route) b -> Parser.Parser (b -> c) c
--- transformRoute target r = Parser.map target r

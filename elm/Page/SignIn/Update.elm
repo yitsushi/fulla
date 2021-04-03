@@ -12,28 +12,28 @@ import Page.SignIn.Model exposing (Model, initialModel)
 import Page.SignIn.Token exposing (Token(..))
 
 
-update : Base.Message -> App.Model.Model -> Model -> ( Model, Cmd Base.Message )
+update : Base.Message -> App.Model.Model -> Model -> ( Model, Maybe String, Cmd Base.Message )
 update msg global model =
     case msg of
         Base.SignIn (Msg.NameInput value) ->
-            ( { model | name = value }, Cmd.none )
+            ( { model | name = value }, Nothing, Cmd.none )
 
         Base.SignIn (Msg.TokenInput value) ->
-            ( { model | token = value }, Cmd.none )
+            ( { model | token = value }, Nothing, Cmd.none )
 
         Base.SignIn Msg.SubmitForm ->
-            ( initialModel, sendLoginForm model <| wrapMsg Msg.LoginResponse )
+            ( initialModel, Nothing, sendLoginForm model <| wrapMsg Msg.LoginResponse )
 
         Base.SignIn (Msg.LoginResponse response) ->
             case response of
                 Ok (Token token "") ->
-                    ( model, Cmd.batch [ App.Port.saveToken token, Navigation.pushUrl global.global.navigationKey "/" ] )
+                    ( model, Just token, Cmd.batch [ App.Port.saveToken token, Navigation.pushUrl global.global.navigationKey "/" ] )
 
                 _ ->
-                    ( { model | error = True }, Cmd.none )
+                    ( { model | error = True }, Nothing, Cmd.none )
 
         _ ->
-            ( model, Cmd.none )
+            ( model, Nothing, Cmd.none )
 
 
 wrapMsg : (Result Http.Error Token -> Msg.Message) -> Result Http.Error Token -> Base.Message

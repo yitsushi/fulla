@@ -4,6 +4,7 @@ import Browser.Navigation exposing (Key)
 import App.Route
 import Url exposing (Url)
 import App.Router
+import App.Flags exposing (Flags)
 
 type alias Model =
   { navigationKey : Key
@@ -11,9 +12,9 @@ type alias Model =
   , jwtToken : Maybe String
   }
 
-initialModel : Key -> Url -> Model
-initialModel key url =
+initialModel : Flags -> Key -> Url -> Model
+initialModel flags key url =
   { navigationKey = key
   , page = App.Router.parsedUrl url
-  , jwtToken = Nothing
+  , jwtToken = flags.jwt
   }

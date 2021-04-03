@@ -12,7 +12,7 @@ type alias Model =
   }
 
 initialModel : Flags -> Key -> Url -> Model
-initialModel _ key url =
-  { global = Global.Model.initialModel key url
+initialModel flags key url =
+  { global = Global.Model.initialModel flags key url
   , signIn = Page.SignIn.Model.initialModel
   }

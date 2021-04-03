@@ -14,14 +14,20 @@ update msg model =
 
         -- ( mainPageModel, mainPageCmd ) =
         --     Page.Main.Update.update msg model.mainPage
-
-        ( signInModel, signInCmd ) =
+        ( signInModel, newToken, signInCmd ) =
             Page.SignIn.Update.update msg model model.signIn
+
+        jwt =
+            case newToken of
+                Just token ->
+                    Just token
+
+                _ ->
+                    model.global.jwtToken
 
         finalModel =
             { model
-                | global = globalModel
-                -- , mainPage = mainPageModel
+                | global = { globalModel | jwtToken = jwt }
                 , signIn = signInModel
             }
 

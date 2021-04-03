@@ -1,3 +1,5 @@
 module App.Flags exposing (..)
 
-type alias Flags = {}
+type alias Flags =
+  { jwt : Maybe String
+  }
