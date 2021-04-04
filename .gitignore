@@ -40,5 +40,5 @@ dist/
 .envrc
 
 # elm
-public/application.js
+server/static/application.js
 elm-stuff/
