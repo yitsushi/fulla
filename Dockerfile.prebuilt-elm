@@ -1,0 +1,13 @@
+FROM golang:alpine3.13 as builder
+
+COPY . /code
+
+RUN cd /code && \
+      go build -o /fulla . && \
+      chmod +x /fulla
+
+FROM alpine:3.13
+
+COPY --from=builder /fulla /fulla
+
+ENTRYPOINT [ "/fulla" ]
