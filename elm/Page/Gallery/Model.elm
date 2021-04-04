@@ -11,9 +11,9 @@ type alias Object =
   , type_ : String
   }
 
-initialModel : Model
-initialModel =
+initialModel : Maybe String -> Model
+initialModel path =
   { objectList = Nothing
-  , path = ""
+  , path = Maybe.withDefault "/" path
   , error = Nothing
   }

@@ -24,8 +24,8 @@ func NewMinioClient(options MinoiClientOptions) (*minio.Client, error) {
 func MinioClientFromEnv() (*minio.Client, error) {
 	return NewMinioClient(MinoiClientOptions{
 		Endpoint:        os.Getenv("FULLA_ENDPOINT"),
-		AccessKeyID:     os.Getenv("FULLA_ACCESS_KEY"),
-		SecretAccessKey: os.Getenv("FULLA_SECRET_KEY"),
+		AccessKeyID:     os.Getenv("FULLA_ACCESS_KEY_ID"),
+		SecretAccessKey: os.Getenv("FULLA_SECRET_ACCESS_KEY"),
 		UseSSL:          os.Getenv("FULLA_NOSSL") == "",
 	})
 }

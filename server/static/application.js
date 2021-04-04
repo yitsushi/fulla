@@ -4940,23 +4940,6 @@ function _Browser_load(url)
 }
 
 
-function _Url_percentEncode(string)
-{
-	return encodeURIComponent(string);
-}
-
-function _Url_percentDecode(string)
-{
-	try
-	{
-		return $elm$core$Maybe$Just(decodeURIComponent(string));
-	}
-	catch (e)
-	{
-		return $elm$core$Maybe$Nothing;
-	}
-}
-
 
 // SEND REQUEST
 
@@ -5130,6 +5113,23 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
+}
+
+function _Url_percentEncode(string)
+{
+	return encodeURIComponent(string);
+}
+
+function _Url_percentDecode(string)
+{
+	try
+	{
+		return $elm$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch (e)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
 }var $elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
@@ -10729,472 +10729,6 @@ var $elm$core$Basics$never = function (_v0) {
 	}
 };
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$App$Route$Global = function (a) {
-	return {$: 'Global', a: a};
-};
-var $author$project$Global$Route$NotFound = {$: 'NotFound'};
-var $elm$url$Url$Parser$State = F5(
-	function (visited, unvisited, params, frag, value) {
-		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
-	});
-var $elm$url$Url$Parser$getFirstMatch = function (states) {
-	getFirstMatch:
-	while (true) {
-		if (!states.b) {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			var state = states.a;
-			var rest = states.b;
-			var _v1 = state.unvisited;
-			if (!_v1.b) {
-				return $elm$core$Maybe$Just(state.value);
-			} else {
-				if ((_v1.a === '') && (!_v1.b.b)) {
-					return $elm$core$Maybe$Just(state.value);
-				} else {
-					var $temp$states = rest;
-					states = $temp$states;
-					continue getFirstMatch;
-				}
-			}
-		}
-	}
-};
-var $elm$url$Url$Parser$removeFinalEmpty = function (segments) {
-	if (!segments.b) {
-		return _List_Nil;
-	} else {
-		if ((segments.a === '') && (!segments.b.b)) {
-			return _List_Nil;
-		} else {
-			var segment = segments.a;
-			var rest = segments.b;
-			return A2(
-				$elm$core$List$cons,
-				segment,
-				$elm$url$Url$Parser$removeFinalEmpty(rest));
-		}
-	}
-};
-var $elm$url$Url$Parser$preparePath = function (path) {
-	var _v0 = A2($elm$core$String$split, '/', path);
-	if (_v0.b && (_v0.a === '')) {
-		var segments = _v0.b;
-		return $elm$url$Url$Parser$removeFinalEmpty(segments);
-	} else {
-		var segments = _v0;
-		return $elm$url$Url$Parser$removeFinalEmpty(segments);
-	}
-};
-var $elm$url$Url$Parser$addToParametersHelp = F2(
-	function (value, maybeList) {
-		if (maybeList.$ === 'Nothing') {
-			return $elm$core$Maybe$Just(
-				_List_fromArray(
-					[value]));
-		} else {
-			var list = maybeList.a;
-			return $elm$core$Maybe$Just(
-				A2($elm$core$List$cons, value, list));
-		}
-	});
-var $elm$url$Url$percentDecode = _Url_percentDecode;
-var $elm$url$Url$Parser$addParam = F2(
-	function (segment, dict) {
-		var _v0 = A2($elm$core$String$split, '=', segment);
-		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
-			var rawKey = _v0.a;
-			var _v1 = _v0.b;
-			var rawValue = _v1.a;
-			var _v2 = $elm$url$Url$percentDecode(rawKey);
-			if (_v2.$ === 'Nothing') {
-				return dict;
-			} else {
-				var key = _v2.a;
-				var _v3 = $elm$url$Url$percentDecode(rawValue);
-				if (_v3.$ === 'Nothing') {
-					return dict;
-				} else {
-					var value = _v3.a;
-					return A3(
-						$elm$core$Dict$update,
-						key,
-						$elm$url$Url$Parser$addToParametersHelp(value),
-						dict);
-				}
-			}
-		} else {
-			return dict;
-		}
-	});
-var $elm$url$Url$Parser$prepareQuery = function (maybeQuery) {
-	if (maybeQuery.$ === 'Nothing') {
-		return $elm$core$Dict$empty;
-	} else {
-		var qry = maybeQuery.a;
-		return A3(
-			$elm$core$List$foldr,
-			$elm$url$Url$Parser$addParam,
-			$elm$core$Dict$empty,
-			A2($elm$core$String$split, '&', qry));
-	}
-};
-var $elm$url$Url$Parser$parse = F2(
-	function (_v0, url) {
-		var parser = _v0.a;
-		return $elm$url$Url$Parser$getFirstMatch(
-			parser(
-				A5(
-					$elm$url$Url$Parser$State,
-					_List_Nil,
-					$elm$url$Url$Parser$preparePath(url.path),
-					$elm$url$Url$Parser$prepareQuery(url.query),
-					url.fragment,
-					$elm$core$Basics$identity)));
-	});
-var $elm$url$Url$Parser$Parser = function (a) {
-	return {$: 'Parser', a: a};
-};
-var $elm$url$Url$Parser$oneOf = function (parsers) {
-	return $elm$url$Url$Parser$Parser(
-		function (state) {
-			return A2(
-				$elm$core$List$concatMap,
-				function (_v0) {
-					var parser = _v0.a;
-					return parser(state);
-				},
-				parsers);
-		});
-};
-var $author$project$Global$Route$Root = {$: 'Root'};
-var $elm$url$Url$Parser$mapState = F2(
-	function (func, _v0) {
-		var visited = _v0.visited;
-		var unvisited = _v0.unvisited;
-		var params = _v0.params;
-		var frag = _v0.frag;
-		var value = _v0.value;
-		return A5(
-			$elm$url$Url$Parser$State,
-			visited,
-			unvisited,
-			params,
-			frag,
-			func(value));
-	});
-var $elm$url$Url$Parser$map = F2(
-	function (subValue, _v0) {
-		var parseArg = _v0.a;
-		return $elm$url$Url$Parser$Parser(
-			function (_v1) {
-				var visited = _v1.visited;
-				var unvisited = _v1.unvisited;
-				var params = _v1.params;
-				var frag = _v1.frag;
-				var value = _v1.value;
-				return A2(
-					$elm$core$List$map,
-					$elm$url$Url$Parser$mapState(value),
-					parseArg(
-						A5($elm$url$Url$Parser$State, visited, unvisited, params, frag, subValue)));
-			});
-	});
-var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
-	function (state) {
-		return _List_fromArray(
-			[state]);
-	});
-var $author$project$Global$Route$route = A2($elm$url$Url$Parser$map, $author$project$Global$Route$Root, $elm$url$Url$Parser$top);
-var $author$project$Page$Gallery$Route$Root = {$: 'Root'};
-var $author$project$Page$Gallery$Route$Show = function (a) {
-	return {$: 'Show', a: a};
-};
-var $elm$url$Url$Parser$s = function (str) {
-	return $elm$url$Url$Parser$Parser(
-		function (_v0) {
-			var visited = _v0.visited;
-			var unvisited = _v0.unvisited;
-			var params = _v0.params;
-			var frag = _v0.frag;
-			var value = _v0.value;
-			if (!unvisited.b) {
-				return _List_Nil;
-			} else {
-				var next = unvisited.a;
-				var rest = unvisited.b;
-				return _Utils_eq(next, str) ? _List_fromArray(
-					[
-						A5(
-						$elm$url$Url$Parser$State,
-						A2($elm$core$List$cons, next, visited),
-						rest,
-						params,
-						frag,
-						value)
-					]) : _List_Nil;
-			}
-		});
-};
-var $elm$url$Url$Parser$slash = F2(
-	function (_v0, _v1) {
-		var parseBefore = _v0.a;
-		var parseAfter = _v1.a;
-		return $elm$url$Url$Parser$Parser(
-			function (state) {
-				return A2(
-					$elm$core$List$concatMap,
-					parseAfter,
-					parseBefore(state));
-			});
-	});
-var $elm$url$Url$Parser$custom = F2(
-	function (tipe, stringToSomething) {
-		return $elm$url$Url$Parser$Parser(
-			function (_v0) {
-				var visited = _v0.visited;
-				var unvisited = _v0.unvisited;
-				var params = _v0.params;
-				var frag = _v0.frag;
-				var value = _v0.value;
-				if (!unvisited.b) {
-					return _List_Nil;
-				} else {
-					var next = unvisited.a;
-					var rest = unvisited.b;
-					var _v2 = stringToSomething(next);
-					if (_v2.$ === 'Just') {
-						var nextValue = _v2.a;
-						return _List_fromArray(
-							[
-								A5(
-								$elm$url$Url$Parser$State,
-								A2($elm$core$List$cons, next, visited),
-								rest,
-								params,
-								frag,
-								value(nextValue))
-							]);
-					} else {
-						return _List_Nil;
-					}
-				}
-			});
-	});
-var $elm$url$Url$Parser$string = A2($elm$url$Url$Parser$custom, 'STRING', $elm$core$Maybe$Just);
-var $author$project$Page$Gallery$Route$route = A2(
-	$elm$url$Url$Parser$slash,
-	$elm$url$Url$Parser$s('gallery'),
-	$elm$url$Url$Parser$oneOf(
-		_List_fromArray(
-			[
-				A2(
-				$elm$url$Url$Parser$map,
-				$author$project$Page$Gallery$Route$Show,
-				A2($elm$url$Url$Parser$slash, $elm$url$Url$Parser$top, $elm$url$Url$Parser$string)),
-				A2($elm$url$Url$Parser$map, $author$project$Page$Gallery$Route$Root, $elm$url$Url$Parser$top)
-			])));
-var $author$project$Page$SignIn$Route$Root = {$: 'Root'};
-var $author$project$Page$SignIn$Route$route = A2(
-	$elm$url$Url$Parser$map,
-	$author$project$Page$SignIn$Route$Root,
-	$elm$url$Url$Parser$s('signin'));
-var $author$project$App$Route$Gallery = function (a) {
-	return {$: 'Gallery', a: a};
-};
-var $author$project$App$Router$transformGallery = function (r) {
-	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Gallery, r);
-};
-var $author$project$App$Router$transformGlobal = function (r) {
-	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Global, r);
-};
-var $author$project$App$Route$SignIn = function (a) {
-	return {$: 'SignIn', a: a};
-};
-var $author$project$App$Router$transformSignIn = function (r) {
-	return A2($elm$url$Url$Parser$map, $author$project$App$Route$SignIn, r);
-};
-var $author$project$App$Router$routeParser = $elm$url$Url$Parser$oneOf(
-	_List_fromArray(
-		[
-			$author$project$App$Router$transformSignIn($author$project$Page$SignIn$Route$route),
-			$author$project$App$Router$transformGallery($author$project$Page$Gallery$Route$route),
-			$author$project$App$Router$transformGlobal($author$project$Global$Route$route)
-		]));
-var $author$project$App$Router$parsedUrl = function (url) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$App$Route$Global($author$project$Global$Route$NotFound),
-		A2($elm$url$Url$Parser$parse, $author$project$App$Router$routeParser, url));
-};
-var $author$project$Global$Model$initialModel = F3(
-	function (flags, key, url) {
-		return {
-			jwtToken: flags.jwt,
-			navigationKey: key,
-			page: $author$project$App$Router$parsedUrl(url)
-		};
-	});
-var $author$project$Page$Gallery$Model$initialModel = {error: $elm$core$Maybe$Nothing, objectList: $elm$core$Maybe$Nothing, path: ''};
-var $author$project$Page$SignIn$Model$initialModel = {error: false, name: '', token: ''};
-var $author$project$App$Model$initialModel = F3(
-	function (flags, key, url) {
-		return {
-			gallery: $author$project$Page$Gallery$Model$initialModel,
-			global: A3($author$project$Global$Model$initialModel, flags, key, url),
-			signIn: $author$project$Page$SignIn$Model$initialModel
-		};
-	});
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var $author$project$App$Route$redirectCommand = F3(
-	function (page, nav, jwt) {
-		if (jwt.$ === 'Just') {
-			_v1$3:
-			while (true) {
-				switch (page.$) {
-					case 'Gallery':
-						return $elm$core$Platform$Cmd$none;
-					case 'Global':
-						switch (page.a.$) {
-							case 'NotFound':
-								var _v2 = page.a;
-								return $elm$core$Platform$Cmd$none;
-							case 'SomethingWentWrong':
-								return $elm$core$Platform$Cmd$none;
-							default:
-								break _v1$3;
-						}
-					default:
-						break _v1$3;
-				}
-			}
-			return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/gallery');
-		} else {
-			if (page.$ === 'SignIn') {
-				return $elm$core$Platform$Cmd$none;
-			} else {
-				return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/signin');
-			}
-		}
-	});
-var $author$project$App$Init$init = F3(
-	function (flags, url, key) {
-		var model = A3($author$project$App$Model$initialModel, flags, key, url);
-		var command = A3($author$project$App$Route$redirectCommand, model.global.page, model.global.navigationKey, model.global.jwtToken);
-		return _Utils_Tuple2(model, command);
-	});
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$json$Json$Decode$null = _Json_decodeNull;
-var $author$project$App$Message$Global = function (a) {
-	return {$: 'Global', a: a};
-};
-var $author$project$Global$Message$UrlChanged = function (a) {
-	return {$: 'UrlChanged', a: a};
-};
-var $author$project$App$Router$onUrlChange = function (url) {
-	return $author$project$App$Message$Global(
-		$author$project$Global$Message$UrlChanged(url));
-};
-var $author$project$Global$Message$UrlRequest = function (a) {
-	return {$: 'UrlRequest', a: a};
-};
-var $author$project$App$Router$onUrlRequest = function (request) {
-	return $author$project$App$Message$Global(
-		$author$project$Global$Message$UrlRequest(request));
-};
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $author$project$App$Message$NoOp = {$: 'NoOp'};
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$url$Url$addPort = F2(
-	function (maybePort, starter) {
-		if (maybePort.$ === 'Nothing') {
-			return starter;
-		} else {
-			var port_ = maybePort.a;
-			return starter + (':' + $elm$core$String$fromInt(port_));
-		}
-	});
-var $elm$url$Url$addPrefixed = F3(
-	function (prefix, maybeSegment, starter) {
-		if (maybeSegment.$ === 'Nothing') {
-			return starter;
-		} else {
-			var segment = maybeSegment.a;
-			return _Utils_ap(
-				starter,
-				_Utils_ap(prefix, segment));
-		}
-	});
-var $elm$url$Url$toString = function (url) {
-	var http = function () {
-		var _v0 = url.protocol;
-		if (_v0.$ === 'Http') {
-			return 'http://';
-		} else {
-			return 'https://';
-		}
-	}();
-	return A3(
-		$elm$url$Url$addPrefixed,
-		'#',
-		url.fragment,
-		A3(
-			$elm$url$Url$addPrefixed,
-			'?',
-			url.query,
-			_Utils_ap(
-				A2(
-					$elm$url$Url$addPort,
-					url.port_,
-					_Utils_ap(http, url.host)),
-				url.path)));
-};
-var $author$project$Global$Update$update = F2(
-	function (msg, model) {
-		update:
-		while (true) {
-			if (msg.$ === 'Global') {
-				var scopedMsg = msg.a;
-				switch (scopedMsg.$) {
-					case 'NavigateTo':
-						var url = scopedMsg.a;
-						return _Utils_Tuple2(
-							model,
-							A2($elm$browser$Browser$Navigation$pushUrl, model.navigationKey, url));
-					case 'UrlChanged':
-						var url = scopedMsg.a;
-						var $temp$msg = $author$project$App$Message$NoOp,
-							$temp$model = _Utils_update(
-							model,
-							{
-								page: $author$project$App$Router$parsedUrl(url)
-							});
-						msg = $temp$msg;
-						model = $temp$model;
-						continue update;
-					default:
-						var request = scopedMsg.a;
-						if (request.$ === 'Internal') {
-							var url = request.a;
-							return _Utils_Tuple2(
-								model,
-								A2(
-									$elm$browser$Browser$Navigation$pushUrl,
-									model.navigationKey,
-									$elm$url$Url$toString(url)));
-						} else {
-							var url = request.a;
-							return _Utils_Tuple2(
-								model,
-								$elm$browser$Browser$Navigation$load(url));
-						}
-				}
-			} else {
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			}
-		}
-	});
 var $author$project$Page$Gallery$Message$ObjectListArrived = function (a) {
 	return {$: 'ObjectListArrived', a: a};
 };
@@ -11484,31 +11018,555 @@ var $author$project$Page$Gallery$Request$wrapMsg = F2(
 		return $author$project$App$Message$Gallery(
 			msg(param));
 	});
-var $author$project$Page$Gallery$Update$update = F3(
-	function (msg, global, model) {
-		var _v0 = model.objectList;
-		if (_v0.$ === 'Nothing') {
-			if ((msg.$ === 'Gallery') && (msg.a.$ === 'ObjectListArrived')) {
-				var response = msg.a.a;
-				if (response.$ === 'Ok') {
-					var list = response.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								objectList: $elm$core$Maybe$Just(list)
-							}),
-						$elm$core$Platform$Cmd$none);
+var $author$project$Page$Gallery$Init$initialCmd = function (model) {
+	return A3(
+		$author$project$Page$Gallery$Request$objectsOnPath,
+		model.global.jwtToken,
+		model.gallery,
+		$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived));
+};
+var $author$project$App$Route$Global = function (a) {
+	return {$: 'Global', a: a};
+};
+var $author$project$Global$Route$NotFound = {$: 'NotFound'};
+var $elm$url$Url$Parser$State = F5(
+	function (visited, unvisited, params, frag, value) {
+		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
+	});
+var $elm$url$Url$Parser$getFirstMatch = function (states) {
+	getFirstMatch:
+	while (true) {
+		if (!states.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var state = states.a;
+			var rest = states.b;
+			var _v1 = state.unvisited;
+			if (!_v1.b) {
+				return $elm$core$Maybe$Just(state.value);
+			} else {
+				if ((_v1.a === '') && (!_v1.b.b)) {
+					return $elm$core$Maybe$Just(state.value);
 				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
+					var $temp$states = rest;
+					states = $temp$states;
+					continue getFirstMatch;
+				}
+			}
+		}
+	}
+};
+var $elm$url$Url$Parser$removeFinalEmpty = function (segments) {
+	if (!segments.b) {
+		return _List_Nil;
+	} else {
+		if ((segments.a === '') && (!segments.b.b)) {
+			return _List_Nil;
+		} else {
+			var segment = segments.a;
+			var rest = segments.b;
+			return A2(
+				$elm$core$List$cons,
+				segment,
+				$elm$url$Url$Parser$removeFinalEmpty(rest));
+		}
+	}
+};
+var $elm$url$Url$Parser$preparePath = function (path) {
+	var _v0 = A2($elm$core$String$split, '/', path);
+	if (_v0.b && (_v0.a === '')) {
+		var segments = _v0.b;
+		return $elm$url$Url$Parser$removeFinalEmpty(segments);
+	} else {
+		var segments = _v0;
+		return $elm$url$Url$Parser$removeFinalEmpty(segments);
+	}
+};
+var $elm$url$Url$Parser$addToParametersHelp = F2(
+	function (value, maybeList) {
+		if (maybeList.$ === 'Nothing') {
+			return $elm$core$Maybe$Just(
+				_List_fromArray(
+					[value]));
+		} else {
+			var list = maybeList.a;
+			return $elm$core$Maybe$Just(
+				A2($elm$core$List$cons, value, list));
+		}
+	});
+var $elm$url$Url$percentDecode = _Url_percentDecode;
+var $elm$url$Url$Parser$addParam = F2(
+	function (segment, dict) {
+		var _v0 = A2($elm$core$String$split, '=', segment);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var rawKey = _v0.a;
+			var _v1 = _v0.b;
+			var rawValue = _v1.a;
+			var _v2 = $elm$url$Url$percentDecode(rawKey);
+			if (_v2.$ === 'Nothing') {
+				return dict;
+			} else {
+				var key = _v2.a;
+				var _v3 = $elm$url$Url$percentDecode(rawValue);
+				if (_v3.$ === 'Nothing') {
+					return dict;
+				} else {
+					var value = _v3.a;
+					return A3(
+						$elm$core$Dict$update,
+						key,
+						$elm$url$Url$Parser$addToParametersHelp(value),
+						dict);
+				}
+			}
+		} else {
+			return dict;
+		}
+	});
+var $elm$url$Url$Parser$prepareQuery = function (maybeQuery) {
+	if (maybeQuery.$ === 'Nothing') {
+		return $elm$core$Dict$empty;
+	} else {
+		var qry = maybeQuery.a;
+		return A3(
+			$elm$core$List$foldr,
+			$elm$url$Url$Parser$addParam,
+			$elm$core$Dict$empty,
+			A2($elm$core$String$split, '&', qry));
+	}
+};
+var $elm$url$Url$Parser$parse = F2(
+	function (_v0, url) {
+		var parser = _v0.a;
+		return $elm$url$Url$Parser$getFirstMatch(
+			parser(
+				A5(
+					$elm$url$Url$Parser$State,
+					_List_Nil,
+					$elm$url$Url$Parser$preparePath(url.path),
+					$elm$url$Url$Parser$prepareQuery(url.query),
+					url.fragment,
+					$elm$core$Basics$identity)));
+	});
+var $elm$url$Url$Parser$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$oneOf = function (parsers) {
+	return $elm$url$Url$Parser$Parser(
+		function (state) {
+			return A2(
+				$elm$core$List$concatMap,
+				function (_v0) {
+					var parser = _v0.a;
+					return parser(state);
+				},
+				parsers);
+		});
+};
+var $author$project$Global$Route$Root = {$: 'Root'};
+var $elm$url$Url$Parser$mapState = F2(
+	function (func, _v0) {
+		var visited = _v0.visited;
+		var unvisited = _v0.unvisited;
+		var params = _v0.params;
+		var frag = _v0.frag;
+		var value = _v0.value;
+		return A5(
+			$elm$url$Url$Parser$State,
+			visited,
+			unvisited,
+			params,
+			frag,
+			func(value));
+	});
+var $elm$url$Url$Parser$map = F2(
+	function (subValue, _v0) {
+		var parseArg = _v0.a;
+		return $elm$url$Url$Parser$Parser(
+			function (_v1) {
+				var visited = _v1.visited;
+				var unvisited = _v1.unvisited;
+				var params = _v1.params;
+				var frag = _v1.frag;
+				var value = _v1.value;
+				return A2(
+					$elm$core$List$map,
+					$elm$url$Url$Parser$mapState(value),
+					parseArg(
+						A5($elm$url$Url$Parser$State, visited, unvisited, params, frag, subValue)));
+			});
+	});
+var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
+	function (state) {
+		return _List_fromArray(
+			[state]);
+	});
+var $author$project$Global$Route$route = A2($elm$url$Url$Parser$map, $author$project$Global$Route$Root, $elm$url$Url$Parser$top);
+var $author$project$Page$Gallery$Route$Root = {$: 'Root'};
+var $author$project$Page$Gallery$Route$Show = function (a) {
+	return {$: 'Show', a: a};
+};
+var $elm$url$Url$Parser$query = function (_v0) {
+	var queryParser = _v0.a;
+	return $elm$url$Url$Parser$Parser(
+		function (_v1) {
+			var visited = _v1.visited;
+			var unvisited = _v1.unvisited;
+			var params = _v1.params;
+			var frag = _v1.frag;
+			var value = _v1.value;
+			return _List_fromArray(
+				[
+					A5(
+					$elm$url$Url$Parser$State,
+					visited,
+					unvisited,
+					params,
+					frag,
+					value(
+						queryParser(params)))
+				]);
+		});
+};
+var $elm$url$Url$Parser$slash = F2(
+	function (_v0, _v1) {
+		var parseBefore = _v0.a;
+		var parseAfter = _v1.a;
+		return $elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					$elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var $elm$url$Url$Parser$questionMark = F2(
+	function (parser, queryParser) {
+		return A2(
+			$elm$url$Url$Parser$slash,
+			parser,
+			$elm$url$Url$Parser$query(queryParser));
+	});
+var $elm$url$Url$Parser$s = function (str) {
+	return $elm$url$Url$Parser$Parser(
+		function (_v0) {
+			var visited = _v0.visited;
+			var unvisited = _v0.unvisited;
+			var params = _v0.params;
+			var frag = _v0.frag;
+			var value = _v0.value;
+			if (!unvisited.b) {
+				return _List_Nil;
+			} else {
+				var next = unvisited.a;
+				var rest = unvisited.b;
+				return _Utils_eq(next, str) ? _List_fromArray(
+					[
+						A5(
+						$elm$url$Url$Parser$State,
+						A2($elm$core$List$cons, next, visited),
+						rest,
+						params,
+						frag,
+						value)
+					]) : _List_Nil;
+			}
+		});
+};
+var $elm$url$Url$Parser$Internal$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$Query$custom = F2(
+	function (key, func) {
+		return $elm$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return func(
+					A2(
+						$elm$core$Maybe$withDefault,
+						_List_Nil,
+						A2($elm$core$Dict$get, key, dict)));
+			});
+	});
+var $elm$url$Url$Parser$Query$string = function (key) {
+	return A2(
+		$elm$url$Url$Parser$Query$custom,
+		key,
+		function (stringList) {
+			if (stringList.b && (!stringList.b.b)) {
+				var str = stringList.a;
+				return $elm$core$Maybe$Just(str);
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		});
+};
+var $author$project$Page$Gallery$Route$route = A2(
+	$elm$url$Url$Parser$slash,
+	$elm$url$Url$Parser$s('gallery'),
+	$elm$url$Url$Parser$oneOf(
+		_List_fromArray(
+			[
+				A2(
+				$elm$url$Url$Parser$map,
+				$author$project$Page$Gallery$Route$Show,
+				A2(
+					$elm$url$Url$Parser$questionMark,
+					$elm$url$Url$Parser$s('show'),
+					$elm$url$Url$Parser$Query$string('path'))),
+				A2($elm$url$Url$Parser$map, $author$project$Page$Gallery$Route$Root, $elm$url$Url$Parser$top)
+			])));
+var $author$project$Page$SignIn$Route$Root = {$: 'Root'};
+var $author$project$Page$SignIn$Route$route = A2(
+	$elm$url$Url$Parser$map,
+	$author$project$Page$SignIn$Route$Root,
+	$elm$url$Url$Parser$s('signin'));
+var $author$project$App$Route$Gallery = function (a) {
+	return {$: 'Gallery', a: a};
+};
+var $author$project$App$Router$transformGallery = function (r) {
+	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Gallery, r);
+};
+var $author$project$App$Router$transformGlobal = function (r) {
+	return A2($elm$url$Url$Parser$map, $author$project$App$Route$Global, r);
+};
+var $author$project$App$Route$SignIn = function (a) {
+	return {$: 'SignIn', a: a};
+};
+var $author$project$App$Router$transformSignIn = function (r) {
+	return A2($elm$url$Url$Parser$map, $author$project$App$Route$SignIn, r);
+};
+var $author$project$App$Router$routeParser = $elm$url$Url$Parser$oneOf(
+	_List_fromArray(
+		[
+			$author$project$App$Router$transformSignIn($author$project$Page$SignIn$Route$route),
+			$author$project$App$Router$transformGallery($author$project$Page$Gallery$Route$route),
+			$author$project$App$Router$transformGlobal($author$project$Global$Route$route)
+		]));
+var $author$project$App$Router$parsedUrl = function (url) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$App$Route$Global($author$project$Global$Route$NotFound),
+		A2($elm$url$Url$Parser$parse, $author$project$App$Router$routeParser, url));
+};
+var $author$project$Global$Model$initialModel = F3(
+	function (flags, key, url) {
+		return {
+			jwtToken: flags.jwt,
+			navigationKey: key,
+			page: $author$project$App$Router$parsedUrl(url)
+		};
+	});
+var $author$project$Page$Gallery$Model$initialModel = function (path) {
+	return {
+		error: $elm$core$Maybe$Nothing,
+		objectList: $elm$core$Maybe$Nothing,
+		path: A2($elm$core$Maybe$withDefault, '/', path)
+	};
+};
+var $author$project$Page$SignIn$Model$initialModel = {error: false, name: '', token: ''};
+var $author$project$App$Model$initialModel = F3(
+	function (flags, key, url) {
+		var signInModel = $author$project$Page$SignIn$Model$initialModel;
+		var globalModel = A3($author$project$Global$Model$initialModel, flags, key, url);
+		var galleryModel = function () {
+			var _v0 = globalModel.page;
+			if ((_v0.$ === 'Gallery') && (_v0.a.$ === 'Show')) {
+				var path = _v0.a.a;
+				return $author$project$Page$Gallery$Model$initialModel(path);
+			} else {
+				return $author$project$Page$Gallery$Model$initialModel(
+					$elm$core$Maybe$Just('/'));
+			}
+		}();
+		return {gallery: galleryModel, global: globalModel, signIn: signInModel};
+	});
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $author$project$App$Route$redirectCommand = F3(
+	function (page, nav, jwt) {
+		if (jwt.$ === 'Just') {
+			_v1$3:
+			while (true) {
+				switch (page.$) {
+					case 'Gallery':
+						return $elm$core$Platform$Cmd$none;
+					case 'Global':
+						switch (page.a.$) {
+							case 'NotFound':
+								var _v2 = page.a;
+								return $elm$core$Platform$Cmd$none;
+							case 'SomethingWentWrong':
+								return $elm$core$Platform$Cmd$none;
+							default:
+								break _v1$3;
+						}
+					default:
+						break _v1$3;
+				}
+			}
+			return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/gallery');
+		} else {
+			if (page.$ === 'SignIn') {
+				return $elm$core$Platform$Cmd$none;
+			} else {
+				return A2($elm$browser$Browser$Navigation$pushUrl, nav, '/signin');
+			}
+		}
+	});
+var $author$project$App$Init$init = F3(
+	function (flags, url, key) {
+		var model = A3($author$project$App$Model$initialModel, flags, key, url);
+		var command = $elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					A3($author$project$App$Route$redirectCommand, model.global.page, model.global.navigationKey, model.global.jwtToken),
+					function () {
+					var _v0 = model.global.jwtToken;
+					if (_v0.$ === 'Nothing') {
+						return $elm$core$Platform$Cmd$none;
+					} else {
+						return $author$project$Page$Gallery$Init$initialCmd(model);
+					}
+				}()
+				]));
+		return _Utils_Tuple2(model, command);
+	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $author$project$App$Message$Global = function (a) {
+	return {$: 'Global', a: a};
+};
+var $author$project$Global$Message$UrlChanged = function (a) {
+	return {$: 'UrlChanged', a: a};
+};
+var $author$project$App$Router$onUrlChange = function (url) {
+	return $author$project$App$Message$Global(
+		$author$project$Global$Message$UrlChanged(url));
+};
+var $author$project$Global$Message$UrlRequest = function (a) {
+	return {$: 'UrlRequest', a: a};
+};
+var $author$project$App$Router$onUrlRequest = function (request) {
+	return $author$project$App$Message$Global(
+		$author$project$Global$Message$UrlRequest(request));
+};
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $author$project$App$Message$NoOp = {$: 'NoOp'};
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
+		} else {
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
+		}
+	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
+var $author$project$Global$Update$update = F2(
+	function (msg, model) {
+		update:
+		while (true) {
+			if (msg.$ === 'Global') {
+				var scopedMsg = msg.a;
+				switch (scopedMsg.$) {
+					case 'NavigateTo':
+						var url = scopedMsg.a;
+						return _Utils_Tuple2(
+							model,
+							A2($elm$browser$Browser$Navigation$pushUrl, model.navigationKey, url));
+					case 'UrlChanged':
+						var url = scopedMsg.a;
+						var $temp$msg = $author$project$App$Message$NoOp,
+							$temp$model = _Utils_update(
 							model,
 							{
-								error: $elm$core$Maybe$Just('something went wrong')
-							}),
-						$elm$core$Platform$Cmd$none);
+								page: $author$project$App$Router$parsedUrl(url)
+							});
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					default:
+						var request = scopedMsg.a;
+						if (request.$ === 'Internal') {
+							var url = request.a;
+							return _Utils_Tuple2(
+								model,
+								A2(
+									$elm$browser$Browser$Navigation$pushUrl,
+									model.navigationKey,
+									$elm$url$Url$toString(url)));
+						} else {
+							var url = request.a;
+							return _Utils_Tuple2(
+								model,
+								$elm$browser$Browser$Navigation$load(url));
+						}
 				}
 			} else {
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			}
+		}
+	});
+var $author$project$Page$Gallery$Update$update = F3(
+	function (msg, global, model) {
+		if ((msg.$ === 'Gallery') && (msg.a.$ === 'ObjectListArrived')) {
+			var response = msg.a.a;
+			if (response.$ === 'Ok') {
+				var list = response.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							objectList: $elm$core$Maybe$Just(list)
+						}),
+					$elm$core$Platform$Cmd$none);
+			} else {
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							error: $elm$core$Maybe$Just('something went wrong')
+						}),
+					$elm$core$Platform$Cmd$none);
+			}
+		} else {
+			var _v2 = model.objectList;
+			if (_v2.$ === 'Nothing') {
 				return _Utils_Tuple2(
 					model,
 					A3(
@@ -11516,9 +11574,9 @@ var $author$project$Page$Gallery$Update$update = F3(
 						global.global.jwtToken,
 						model,
 						$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived)));
+			} else {
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			}
-		} else {
-			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Page$SignIn$Message$LoginResponse = function (a) {
@@ -11721,8 +11779,141 @@ var $author$project$Global$View$view = F2(
 				}())
 			]);
 	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $author$project$Page$Gallery$View$filterType = F2(
+	function (type_, object) {
+		return _Utils_eq(object.type_, type_);
+	});
+var $elm$core$String$endsWith = _String_endsWith;
+var $author$project$Page$Gallery$View$prefixPath = F2(
+	function (prefix, path) {
+		var p = A2($elm$core$String$endsWith, '/', prefix) ? prefix : (prefix + '/');
+		return '/gallery/show?path=' + (p + path);
+	});
+var $author$project$Page$Gallery$View$sort = function (object) {
+	return object.key;
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Page$Gallery$View$basename = function (object) {
+	var _v0 = object.type_;
+	switch (_v0) {
+		case 'folder':
+			return A2(
+				$elm$core$Basics$composeL,
+				A2(
+					$elm$core$Basics$composeL,
+					A2(
+						$elm$core$Basics$composeL,
+						A2(
+							$elm$core$Basics$composeL,
+							$elm$core$Maybe$withDefault(''),
+							$elm$core$List$head),
+						$elm$core$List$drop(1)),
+					$elm$core$List$reverse),
+				$elm$core$String$split('/'))(object.key) + '/';
+		case 'file':
+			return A2(
+				$elm$core$Basics$composeL,
+				A2(
+					$elm$core$Basics$composeL,
+					A2(
+						$elm$core$Basics$composeL,
+						$elm$core$Maybe$withDefault(''),
+						$elm$core$List$head),
+					$elm$core$List$reverse),
+				$elm$core$String$split('/'))(object.key);
+		default:
+			return '';
+	}
+};
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Page$Gallery$View$viewFile = function (file) {
+	var name = $author$project$Page$Gallery$View$basename(file);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('file')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$img,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$src('/api/get/' + file.key),
+						$elm$html$Html$Attributes$alt(name)
+					]),
+				_List_Nil),
+				$elm$html$Html$text(name)
+			]));
+};
+var $author$project$Page$Gallery$View$viewFolder = function (folder) {
+	var name = $author$project$Page$Gallery$View$basename(folder);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('folder')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$href('/gallery/show?path=/' + folder.key)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(name)
+					]))
+			]));
+};
 var $author$project$Page$Gallery$View$view = F2(
 	function (_v0, model) {
+		var pfx = $author$project$Page$Gallery$View$prefixPath(model.gallery.path);
+		var objects = A2($elm$core$Maybe$withDefault, _List_Nil, model.gallery.objectList);
+		var folders = A2(
+			$elm$core$List$sortBy,
+			$author$project$Page$Gallery$View$sort,
+			A2(
+				$elm$core$List$filter,
+				$author$project$Page$Gallery$View$filterType('folder'),
+				objects));
+		var files = A2(
+			$elm$core$List$sortBy,
+			$author$project$Page$Gallery$View$sort,
+			A2(
+				$elm$core$List$filter,
+				$author$project$Page$Gallery$View$filterType('file'),
+				objects));
 		return _List_fromArray(
 			[
 				A2(
@@ -11739,12 +11930,16 @@ var $author$project$Page$Gallery$View$view = F2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('file-list')
+						$elm$html$Html$Attributes$class('folder-list')
 					]),
+				A2($elm$core$List$map, $author$project$Page$Gallery$View$viewFolder, folders)),
+				A2(
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('---')
-					]))
+						$elm$html$Html$Attributes$class('file-list')
+					]),
+				A2($elm$core$List$map, $author$project$Page$Gallery$View$viewFile, files))
 			]);
 	});
 var $author$project$Page$SignIn$Message$NameInput = function (a) {
@@ -11754,19 +11949,12 @@ var $author$project$Page$SignIn$Message$SubmitForm = {$: 'SubmitForm'};
 var $author$project$Page$SignIn$Message$TokenInput = function (a) {
 	return {$: 'TokenInput', a: a};
 };
-var $elm$html$Html$img = _VirtualDom_node('img');
 var $author$project$Page$SignIn$View$onInputHandler = F2(
 	function (msg, str) {
 		return $author$project$App$Message$SignIn(
 			msg(str));
 	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
 var $author$project$Page$SignIn$View$view = F2(
 	function (_v0, model) {
 		return _List_fromArray(

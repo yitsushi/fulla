@@ -6,6 +6,8 @@ import Url exposing (Url)
 import Page.SignIn.Model
 import App.Flags exposing (Flags)
 import Page.Gallery.Model
+import App.Route
+import Page.Gallery.Route
 
 type alias Model =
   { global : Global.Model.Model
@@ -15,7 +17,14 @@ type alias Model =
 
 initialModel : Flags -> Key -> Url -> Model
 initialModel flags key url =
-  { global = Global.Model.initialModel flags key url
-  , signIn = Page.SignIn.Model.initialModel
-  , gallery = Page.Gallery.Model.initialModel
+  let
+    globalModel = Global.Model.initialModel flags key url
+    signInModel = Page.SignIn.Model.initialModel
+    galleryModel = case globalModel.page of
+      App.Route.Gallery (Page.Gallery.Route.Show path) -> Page.Gallery.Model.initialModel path
+      _ -> Page.Gallery.Model.initialModel (Just "/")
+  in
+  { global = globalModel
+  , signIn = signInModel
+  , gallery = galleryModel
   }
