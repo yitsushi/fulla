@@ -58,6 +58,8 @@ func login(c *fiber.Ctx) error {
 	token, err := jwt.Encode(jwt.NewHeader(), payload, []byte(expectedToken))
 	response.Token = token
 
+	c.Cookie(&fiber.Cookie{Name: "jwt", Value: token})
+
 	if err != nil {
 		response.Error = err.Error()
 	}
@@ -66,7 +68,13 @@ func login(c *fiber.Ctx) error {
 }
 
 func checkAuth(c *fiber.Ctx) error {
-	_, _, err := jwt.Validate(c.Get("JWT-Token"), []byte(secret()), "", userData{})
+	token := c.Get("JWT-Token")
+
+	if token == "" {
+		token = c.Cookies("jwt", "")
+	}
+
+	_, _, err := jwt.Validate(token, []byte(secret()), "", userData{})
 	if err != nil {
 		return err
 	}

@@ -13,17 +13,40 @@ import Html exposing (object)
 view : Page.Gallery.Route.Route -> App.Model.Model -> List (Html.Html App.Message.Message)
 view _ model =
     let
-        pfx = prefixPath model.gallery.path
         objects = Maybe.withDefault [] model.gallery.objectList
         folders = List.sortBy sort <| List.filter (filterType "folder") objects
         files = List.sortBy sort <| List.filter (filterType "file") objects
     in
-    [ Html.div [ Html.Attributes.class "breadcrumb" ] [ Html.text model.gallery.path ]
+    [ Html.div [ Html.Attributes.class "breadcrumb" ] <| bcToLink (Breadcrumb "root" "/") :: breadcrumb model.gallery.path
     , Html.div [ Html.Attributes.class "folder-list" ]
         <| List.map viewFolder folders
     , Html.div [ Html.Attributes.class "file-list" ]
         <| List.map viewFile files
     ]
+
+breadcrumb : String -> List (Html.Html App.Message.Message)
+breadcrumb path =
+    List.map bcToLink <| listToBreadcrumb <| List.filter (not << String.isEmpty) <| String.split "/" path
+
+type Breadcrumb = Breadcrumb String String
+
+bcTarget : Breadcrumb -> String
+bcTarget (Breadcrumb _ target) = target
+
+bcText : Breadcrumb -> String
+bcText (Breadcrumb text _) = text
+
+bcToLink : Breadcrumb -> Html.Html App.Message.Message
+bcToLink (Breadcrumb str target) = Html.a [ Html.Attributes.href <| "/gallery/show?path=" ++ target ] [ Html.text str ]
+
+
+listToBreadcrumb : List String -> List Breadcrumb
+listToBreadcrumb path =
+    let
+        f : String -> List Breadcrumb -> List Breadcrumb
+        f item carry = carry ++ [Breadcrumb item <| (bcTarget << Maybe.withDefault (Breadcrumb "" "") << List.head << List.reverse) carry ++ "/" ++ item]
+    in 
+        List.foldl f [] path
 
 viewFolder : Page.Gallery.Model.Object -> Html.Html App.Message.Message
 viewFolder folder =

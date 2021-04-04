@@ -10831,6 +10831,7 @@ var $elm$http$Http$Header = F2(
 		return {$: 'Header', a: a, b: b};
 	});
 var $elm$http$Http$header = $elm$http$Http$Header;
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Page$Gallery$Model$Object = F2(
 	function (key, type_) {
 		return {key: key, type_: type_};
@@ -10993,22 +10994,28 @@ var $elm$http$Http$request = function (r) {
 };
 var $author$project$Page$Gallery$Request$objectsOnPath = F3(
 	function (jwt, model, msg) {
-		return $elm$http$Http$request(
-			{
-				body: $elm$http$Http$emptyBody,
-				expect: A2($elm$http$Http$expectJson, msg, $author$project$Page$Gallery$Request$objectListDecoder),
-				headers: _List_fromArray(
-					[
-						A2(
-						$elm$http$Http$header,
-						'JWT-TOKEN',
-						A2($elm$core$Maybe$withDefault, '', jwt))
-					]),
-				method: 'GET',
-				timeout: $elm$core$Maybe$Nothing,
-				tracker: $elm$core$Maybe$Nothing,
-				url: '/api/list' + model.path
-			});
+		var _v0 = A2($elm$core$Debug$log, 'JWT for the request', jwt);
+		var _v1 = A2($elm$core$Debug$log, 'model', model);
+		if (jwt.$ === 'Nothing') {
+			return $elm$core$Platform$Cmd$none;
+		} else {
+			return $elm$http$Http$request(
+				{
+					body: $elm$http$Http$emptyBody,
+					expect: A2($elm$http$Http$expectJson, msg, $author$project$Page$Gallery$Request$objectListDecoder),
+					headers: _List_fromArray(
+						[
+							A2(
+							$elm$http$Http$header,
+							'JWT-TOKEN',
+							A2($elm$core$Maybe$withDefault, '', jwt))
+						]),
+					method: 'GET',
+					timeout: $elm$core$Maybe$Nothing,
+					tracker: $elm$core$Maybe$Nothing,
+					url: '/api/list' + model.path
+				});
+		}
 	});
 var $author$project$App$Message$Gallery = function (a) {
 	return {$: 'Gallery', a: a};
@@ -11544,39 +11551,76 @@ var $author$project$Global$Update$update = F2(
 	});
 var $author$project$Page$Gallery$Update$update = F3(
 	function (msg, global, model) {
-		if ((msg.$ === 'Gallery') && (msg.a.$ === 'ObjectListArrived')) {
-			var response = msg.a.a;
-			if (response.$ === 'Ok') {
-				var list = response.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							objectList: $elm$core$Maybe$Just(list)
-						}),
-					$elm$core$Platform$Cmd$none);
-			} else {
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							error: $elm$core$Maybe$Just('something went wrong')
-						}),
-					$elm$core$Platform$Cmd$none);
+		_v0$2:
+		while (true) {
+			switch (msg.$) {
+				case 'Gallery':
+					if (msg.a.$ === 'ObjectListArrived') {
+						var response = msg.a.a;
+						if (response.$ === 'Ok') {
+							var list = response.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										objectList: $elm$core$Maybe$Just(list)
+									}),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										error: $elm$core$Maybe$Just('something went wrong')
+									}),
+								$elm$core$Platform$Cmd$none);
+						}
+					} else {
+						break _v0$2;
+					}
+				case 'Global':
+					if (msg.a.$ === 'UrlChanged') {
+						var url = msg.a.a;
+						var _v2 = $author$project$App$Router$parsedUrl(url);
+						if ((_v2.$ === 'Gallery') && (_v2.a.$ === 'Show')) {
+							var p = _v2.a.a;
+							var newModel = A2(
+								$elm$core$Debug$log,
+								'neModel',
+								_Utils_update(
+									model,
+									{
+										path: A2($elm$core$Maybe$withDefault, '/', p)
+									}));
+							var _v3 = A2($elm$core$Debug$log, 'msg', msg);
+							return _Utils_Tuple2(
+								newModel,
+								A3(
+									$author$project$Page$Gallery$Request$objectsOnPath,
+									global.global.jwtToken,
+									newModel,
+									$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived)));
+						} else {
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						}
+					} else {
+						break _v0$2;
+					}
+				default:
+					break _v0$2;
 			}
-		} else {
-			var _v2 = model.objectList;
-			if (_v2.$ === 'Nothing') {
-				return _Utils_Tuple2(
+		}
+		var _v4 = model.objectList;
+		if (_v4.$ === 'Nothing') {
+			return _Utils_Tuple2(
+				model,
+				A3(
+					$author$project$Page$Gallery$Request$objectsOnPath,
+					global.global.jwtToken,
 					model,
-					A3(
-						$author$project$Page$Gallery$Request$objectsOnPath,
-						global.global.jwtToken,
-						model,
-						$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived)));
-			} else {
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			}
+					$author$project$Page$Gallery$Request$wrapMsg($author$project$Page$Gallery$Message$ObjectListArrived)));
+		} else {
+			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Page$SignIn$Message$LoginResponse = function (a) {
@@ -11779,6 +11823,24 @@ var $author$project$Global$View$view = F2(
 				}())
 			]);
 	});
+var $author$project$Page$Gallery$View$Breadcrumb = F2(
+	function (a, b) {
+		return {$: 'Breadcrumb', a: a, b: b};
+	});
+var $author$project$Page$Gallery$View$bcToLink = function (_v0) {
+	var str = _v0.a;
+	var target = _v0.b;
+	return A2(
+		$elm$html$Html$a,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$href('/gallery/show?path=' + target)
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(str)
+			]));
+};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -11790,21 +11852,10 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $author$project$Page$Gallery$View$filterType = F2(
-	function (type_, object) {
-		return _Utils_eq(object.type_, type_);
-	});
-var $elm$core$String$endsWith = _String_endsWith;
-var $author$project$Page$Gallery$View$prefixPath = F2(
-	function (prefix, path) {
-		var p = A2($elm$core$String$endsWith, '/', prefix) ? prefix : (prefix + '/');
-		return '/gallery/show?path=' + (p + path);
-	});
-var $author$project$Page$Gallery$View$sort = function (object) {
-	return object.key;
+var $author$project$Page$Gallery$View$bcTarget = function (_v0) {
+	var target = _v0.b;
+	return target;
 };
-var $elm$core$List$sortBy = _List_sortBy;
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -11814,6 +11865,50 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
+var $author$project$Page$Gallery$View$listToBreadcrumb = function (path) {
+	var f = F2(
+		function (item, carry) {
+			return _Utils_ap(
+				carry,
+				_List_fromArray(
+					[
+						A2(
+						$author$project$Page$Gallery$View$Breadcrumb,
+						item,
+						A2(
+							$elm$core$Basics$composeL,
+							A2(
+								$elm$core$Basics$composeL,
+								A2(
+									$elm$core$Basics$composeL,
+									$author$project$Page$Gallery$View$bcTarget,
+									$elm$core$Maybe$withDefault(
+										A2($author$project$Page$Gallery$View$Breadcrumb, '', ''))),
+								$elm$core$List$head),
+							$elm$core$List$reverse)(carry) + ('/' + item))
+					]));
+		});
+	return A3($elm$core$List$foldl, f, _List_Nil, path);
+};
+var $author$project$Page$Gallery$View$breadcrumb = function (path) {
+	return A2(
+		$elm$core$List$map,
+		$author$project$Page$Gallery$View$bcToLink,
+		$author$project$Page$Gallery$View$listToBreadcrumb(
+			A2(
+				$elm$core$List$filter,
+				A2($elm$core$Basics$composeL, $elm$core$Basics$not, $elm$core$String$isEmpty),
+				A2($elm$core$String$split, '/', path))));
+};
+var $author$project$Page$Gallery$View$filterType = F2(
+	function (type_, object) {
+		return _Utils_eq(object.type_, type_);
+	});
+var $author$project$Page$Gallery$View$sort = function (object) {
+	return object.key;
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $author$project$Page$Gallery$View$basename = function (object) {
 	var _v0 = object.type_;
 	switch (_v0) {
@@ -11898,7 +11993,6 @@ var $author$project$Page$Gallery$View$viewFolder = function (folder) {
 };
 var $author$project$Page$Gallery$View$view = F2(
 	function (_v0, model) {
-		var pfx = $author$project$Page$Gallery$View$prefixPath(model.gallery.path);
 		var objects = A2($elm$core$Maybe$withDefault, _List_Nil, model.gallery.objectList);
 		var folders = A2(
 			$elm$core$List$sortBy,
@@ -11922,10 +12016,11 @@ var $author$project$Page$Gallery$View$view = F2(
 					[
 						$elm$html$Html$Attributes$class('breadcrumb')
 					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(model.gallery.path)
-					])),
+				A2(
+					$elm$core$List$cons,
+					$author$project$Page$Gallery$View$bcToLink(
+						A2($author$project$Page$Gallery$View$Breadcrumb, 'root', '/')),
+					$author$project$Page$Gallery$View$breadcrumb(model.gallery.path))),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(

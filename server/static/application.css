@@ -78,3 +78,41 @@ footer > a:hover {
   background-color: #cc60b6;
   color: #ccc;
 }
+
+.breadcrumb {
+  margin-left: 1em;
+  padding: 0.5em 0.5em;
+  font-size: 1.3em;
+  display: inline-block;
+}
+
+.breadcrumb > a {
+  color: #ccc;
+  padding: 0.2em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.breadcrumb > a:hover {
+  color: #fac;
+  cursor: pointer;
+}
+
+.breadcrumb > a::after {
+  content: " ❯";
+}
+
+.file-list .file {
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+  padding: 1.2em 1em;
+  text-align: center;
+}
+
+.file-list .file > img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
