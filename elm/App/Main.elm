@@ -7,6 +7,7 @@ import App.Model exposing (Model)
 import App.Router exposing (onUrlChange, onUrlRequest)
 import App.Update exposing (update)
 import App.View exposing (view)
+import App.Sub exposing (subscriptions)
 import Browser
 
 main : Program Flags Model Message
@@ -15,7 +16,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         , onUrlChange = onUrlChange
         , onUrlRequest = onUrlRequest
         }

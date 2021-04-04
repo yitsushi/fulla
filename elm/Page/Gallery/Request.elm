@@ -14,10 +14,6 @@ wrapMsg msg param =
 
 objectsOnPath : Maybe String -> Model -> (Result Http.Error (List Page.Gallery.Model.Object) -> a) -> Cmd a
 objectsOnPath jwt model msg =
-    let
-        _ = Debug.log "JWT for the request" jwt
-        _ = Debug.log "model" model
-    in
     case jwt of
         Nothing ->
             Cmd.none
@@ -38,10 +34,11 @@ objectsOnPath jwt model msg =
 
 objectDecoder : Decoder Page.Gallery.Model.Object
 objectDecoder =
-    Json.Decode.map2
+    Json.Decode.map3
         Page.Gallery.Model.Object
         (Json.Decode.field "Key" Json.Decode.string)
         (Json.Decode.field "Type" Json.Decode.string)
+        (Json.Decode.field "MIME" Json.Decode.string)
 
 
 objectListDecoder : Decoder (List Page.Gallery.Model.Object)

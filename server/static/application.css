@@ -116,3 +116,56 @@ footer > a:hover {
   object-fit: cover;
   object-position: center;
 }
+
+.folder-list {
+  margin-left: 1em;
+}
+
+.folder-list a.folder {
+  background: #333;
+  color: #ccc;
+  display: inline-block;
+  padding: 0.2em 0.5em;
+  text-decoration: none;
+  border-radius: 4px;
+  margin: 0.2em;
+}
+
+.folder-list a.folder:hover {
+  color: #fac;
+}
+
+.enlarge-popup {
+  position: absolute;
+  top: 0.3em;
+  bottom: 0.3em;
+  left: 0.3em;
+  right: 0.3em;
+  background-color: #111111fc;
+  padding: 0.3em;
+}
+
+.enlarge-popup > img {
+  object-position: center;
+  object-fit: contain;
+  width: 100%;
+  max-height: 100%;
+}
+
+.enlarge-popup > span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 3px;
+  background-color: #444;
+  cursor: pointer;
+}
+
+.enlarge-popup > span:hover {
+  background-color: #fac;
+}
+
+.enlarge-popup > span > img {
+  width: 2em;
+  height: 2em;
+}

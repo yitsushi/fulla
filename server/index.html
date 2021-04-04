@@ -23,6 +23,19 @@
     });
 
     app.ports.saveToken.subscribe(token => localStorage.setItem("jwtToken", token))
+
+    document.addEventListener("keyup", e => {
+      const param = {
+        shiftKey: e.shiftKey,
+        altKey: e.altKey,
+        ctrlKey: e.ctrlKey,
+        key: e.key
+      }
+
+      console.log(param, app.ports);
+
+      app.ports.onKeyEvent.send(param);
+    });
   </script>
 
 </body>

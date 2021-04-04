@@ -2,91 +2,133 @@ module Page.Gallery.View exposing (view)
 
 import App.Message
 import App.Model
-import Html
-import Html.Attributes
-import Page.Gallery.Route
-import Page.Gallery.Model
-import Page.Gallery.Request exposing (objectsOnPath)
 import Html exposing (object)
+import Html.Attributes
+import Html.Events
+import Page.Gallery.Message
+import Page.Gallery.Model
+import Page.Gallery.Route
 
 
 view : Page.Gallery.Route.Route -> App.Model.Model -> List (Html.Html App.Message.Message)
 view _ model =
     let
-        objects = Maybe.withDefault [] model.gallery.objectList
-        folders = List.sortBy sort <| List.filter (filterType "folder") objects
-        files = List.sortBy sort <| List.filter (filterType "file") objects
+        objects =
+            Maybe.withDefault [] model.gallery.objectList
+
+        folders =
+            List.sortBy sort <| List.filter (filterType "folder") objects
+
+        files =
+            List.sortBy sort <| List.filter (\f -> String.startsWith "image" f.mime) <| List.filter (filterType "file") objects
     in
     [ Html.div [ Html.Attributes.class "breadcrumb" ] <| bcToLink (Breadcrumb "root" "/") :: breadcrumb model.gallery.path
-    , Html.div [ Html.Attributes.class "folder-list" ]
-        <| List.map viewFolder folders
-    , Html.div [ Html.Attributes.class "file-list" ]
-        <| List.map viewFile files
+    , Html.div [ Html.Attributes.class "folder-list" ] <|
+        List.map viewFolder folders
+    , Html.div [ Html.Attributes.class "file-list" ] <|
+        List.map viewFile files
+    , case model.gallery.enlarge of
+        Just path ->
+            enlargePopup path
+
+        Nothing ->
+            Html.div [] []
     ]
+
 
 breadcrumb : String -> List (Html.Html App.Message.Message)
 breadcrumb path =
     List.map bcToLink <| listToBreadcrumb <| List.filter (not << String.isEmpty) <| String.split "/" path
 
-type Breadcrumb = Breadcrumb String String
+
+type Breadcrumb
+    = Breadcrumb String String
+
 
 bcTarget : Breadcrumb -> String
-bcTarget (Breadcrumb _ target) = target
+bcTarget (Breadcrumb _ target) =
+    target
 
-bcText : Breadcrumb -> String
-bcText (Breadcrumb text _) = text
 
 bcToLink : Breadcrumb -> Html.Html App.Message.Message
-bcToLink (Breadcrumb str target) = Html.a [ Html.Attributes.href <| "/gallery/show?path=" ++ target ] [ Html.text str ]
+bcToLink (Breadcrumb str target) =
+    Html.a [ Html.Attributes.href <| "/gallery/show?path=" ++ target ] [ Html.text str ]
 
 
 listToBreadcrumb : List String -> List Breadcrumb
 listToBreadcrumb path =
     let
         f : String -> List Breadcrumb -> List Breadcrumb
-        f item carry = carry ++ [Breadcrumb item <| (bcTarget << Maybe.withDefault (Breadcrumb "" "") << List.head << List.reverse) carry ++ "/" ++ item]
-    in 
-        List.foldl f [] path
+        f item carry =
+            carry ++ [ Breadcrumb item <| (bcTarget << Maybe.withDefault (Breadcrumb "" "") << List.head << List.reverse) carry ++ "/" ++ item ]
+    in
+    List.foldl f [] path
+
 
 viewFolder : Page.Gallery.Model.Object -> Html.Html App.Message.Message
 viewFolder folder =
     let
-        name = basename folder
+        name =
+            basename folder
     in
-    Html.div [ Html.Attributes.class "folder" ]
-        [ Html.a [Html.Attributes.href <| "/gallery/show?path=/" ++ folder.key ]
-            [ Html.text name ]
+    Html.a
+        [ Html.Attributes.href <| "/gallery/show?path=/" ++ folder.key
+        , Html.Attributes.class "folder"
         ]
+        [ Html.text name ]
+
 
 viewFile : Page.Gallery.Model.Object -> Html.Html App.Message.Message
 viewFile file =
     let
-        name = basename file
+        name =
+            basename file
     in
     Html.div [ Html.Attributes.class "file" ]
         [ Html.img
             [ Html.Attributes.src <| "/api/get/" ++ file.key
             , Html.Attributes.alt name
-            ] []
+            , Html.Events.onClick <| gEvent <| Page.Gallery.Message.Enlarge file.key
+            ]
+            []
         , Html.text name
         ]
 
+
+gEvent : Page.Gallery.Message.Message -> App.Message.Message
+gEvent msg =
+    App.Message.Gallery msg
+
+
 sort : Page.Gallery.Model.Object -> String
-sort object = object.key
+sort object =
+    object.key
+
 
 filterType : String -> Page.Gallery.Model.Object -> Bool
-filterType type_ object = object.type_ == type_
+filterType type_ object =
+    object.type_ == type_
 
-prefixPath : String -> String -> String
-prefixPath prefix path =
-    let
-        p = if String.endsWith "/" prefix then prefix else prefix ++ "/"
-    in
-        "/gallery/show?path=" ++ p ++ path
 
 basename : Page.Gallery.Model.Object -> String
 basename object =
     case object.type_ of
-       "folder" -> (Maybe.withDefault "" << List.head << List.drop 1 << List.reverse << String.split "/") object.key ++ "/"
-       "file" -> (Maybe.withDefault "" << List.head<< List.reverse << String.split "/") object.key
-       _ -> ""
+        "folder" ->
+            (Maybe.withDefault "" << List.head << List.drop 1 << List.reverse << String.split "/") object.key ++ "/"
+
+        "file" ->
+            (Maybe.withDefault "" << List.head << List.reverse << String.split "/") object.key
+
+        _ ->
+            ""
+
+
+enlargePopup : String -> Html.Html App.Message.Message
+enlargePopup path =
+    Html.div
+        [ Html.Attributes.class "enlarge-popup" ]
+        [ Html.span
+            [ Html.Events.onClick <| gEvent <| Page.Gallery.Message.Shrink ]
+            [ Html.img [ Html.Attributes.src "/static/x.png" ] [] ]
+        , Html.img [ Html.Attributes.src <| "/api/get/" ++ path ] []
+        ]
