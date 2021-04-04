@@ -20,6 +20,7 @@ func rootCommand() *cobra.Command {
 	cmd.PersistentFlags().Bool("debug", false, "spam stdout with debug information")
 
 	cmd.AddCommand(serveCommand())
+	cmd.AddCommand(thumbnailCommand())
 
 	return cmd
 }

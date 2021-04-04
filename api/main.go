@@ -8,6 +8,7 @@ func Entrypoint(router fiber.Router) {
 
 	router.Get("/list/*", checkAuth, listObjects)
 	router.Get("/get/*", checkAuth, getObject)
+	router.Get("/thumbnail/*", checkAuth, getThumbnail)
 	router.Post("/login", login)
 
 	router.Get("*", root)

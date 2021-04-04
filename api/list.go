@@ -40,6 +40,10 @@ func listObjects(c *fiber.Ctx) error {
 	})
 
 	for object := range objectsChan {
+		if object.Key == ".cache/" {
+			continue
+		}
+
 		item := listResponseItem{
 			Key:  object.Key,
 			Type: fileType,

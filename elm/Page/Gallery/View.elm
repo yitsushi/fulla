@@ -86,7 +86,7 @@ viewFile file =
     in
     Html.div [ Html.Attributes.class "file" ]
         [ Html.img
-            [ Html.Attributes.src <| "/api/get/" ++ file.key
+            [ Html.Attributes.src <| "/api/thumbnail/" ++ file.key
             , Html.Attributes.alt name
             , Html.Events.onClick <| gEvent <| Page.Gallery.Message.Enlarge file.key
             ]
