@@ -1,5 +1,15 @@
 # Fulla
 
+- [Fulla](#fulla)
+  - [Why?](#why)
+  - [Configuration](#configuration)
+  - [Example docker compose file](#example-docker-compose-file)
+  - [Start server](#start-server)
+  - [Generate thumbnails](#generate-thumbnails)
+  - [Hotkeys](#hotkeys)
+  - [Note](#note)
+  - [Screenshots](#screenshots)
+
 ## Why?
 
 We have a lot of pictures (mostly about our children). I store them
@@ -31,6 +41,46 @@ FULLA_NOSSL             -> if it's not empty, use http, otherwise use https
 
 FULLA_LOGIN_SECRET      -> secret for login
   If not provided, the system will generate one (not persistent)
+```
+
+## Example docker compose file
+
+* `xxxx` -> access key id (aws, wasabi, minio, any s3 compatible service)
+* `yyyy` -> secret access key (aws, wasabi, minio, any s3 compatible service)
+* `zzzz` -> secret token for login (example: `openssl rand -base64 30`)
+
+```yaml
+---
+version: '3.2'
+
+services:
+  web:
+    image: yitsushi/fulla:1.0.1
+    networks:
+      - traefik-public
+    ports:
+      - 9876
+    command: serve --listen="0.0.0.0:9876"
+    environment:
+      - FULLA_ENDPOINT=storage.mydomain.tld
+      - FULLA_BUCKET=fulla-photos
+      - FULLA_ACCESS_KEY_ID=xxxx
+      - FULLA_SECRET_ACCESS_KEY=yyyy
+      - FULLA_LOGIN_SECRET=zzzz
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.fulla-router.rule=Host(`fulla.mydomain.tld`)"
+        - "traefik.http.services.fulla-service.loadbalancer.server.port=9876"
+        - "traefik.http.routers.fulla-router.tls=true"
+        - "traefik.http.routers.fulla-router.tls.certresolver=cloudflare"
+        - "traefik.docker.network=traefik-public"
+        - "traefik.http.middlewares.wg.ipwhitelist.sourcerange=127.0.0.1/32, 10.100.100.1/24, 172.18.0.1/24"
+        - "traefik.http.routers.fulla-router.middlewares=wg@docker"
+
+networks:
+  traefik-public:
+    external: true
 ```
 
 ## Start server
