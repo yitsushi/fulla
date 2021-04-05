@@ -11,9 +11,16 @@ func thumbnailCommand() *cobra.Command {
 		Use:   "thumbnail",
 		Short: "generate thumbnails",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return storage.GenerateAllThumbnails()
+			numberOfWorkers, flagErr := cmd.Flags().GetInt("workers")
+			if flagErr != nil {
+				return flagErr
+			}
+
+			return storage.GenerateAllThumbnails(numberOfWorkers)
 		},
 	}
+
+	cmd.Flags().Int("workers", 8, "Number of workers")
 
 	return cmd
 }

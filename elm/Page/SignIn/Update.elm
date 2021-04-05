@@ -27,7 +27,13 @@ update msg global model =
         Base.SignIn (Msg.LoginResponse response) ->
             case response of
                 Ok (Token token "") ->
-                    ( model, Just token, Cmd.batch [ App.Port.saveToken token, Navigation.pushUrl global.global.navigationKey "/" ] )
+                    ( model
+                    , Just token
+                    , Cmd.batch
+                        [ App.Port.saveToken token
+                        , Navigation.pushUrl global.global.navigationKey "/"
+                        ]
+                    )
 
                 _ ->
                     ( { model | error = True }, Nothing, Cmd.none )

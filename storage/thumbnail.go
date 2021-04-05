@@ -18,10 +18,42 @@ import (
 const (
 	ThumbnailPrefix = ".cache"
 	ThumbnailSize   = 512
-	numberOfWorkers = 5
 )
 
-func GenerateAllThumbnails() error {
+// func cpuProfile() *os.File {
+// 	fc, err := os.Create("cpuprofile")
+// 	if err != nil {
+// 		log.Fatal("could not create CPU profile: ", err)
+// 	}
+// 	defer fc.Close() // error handling omitted for example
+// 	if err := pprof.StartCPUProfile(fc); err != nil {
+// 		log.Fatal("could not start CPU profile: ", err)
+// 	}
+
+// 	return fc
+// }
+
+// func memProfile(runGC bool) *os.File {
+// 	fm, err := os.Create("memprofile")
+// 	if err != nil {
+// 		log.Fatal("could not create memory profile: ", err)
+// 	}
+
+// 	if runGC {
+// 		runtime.GC() // get up-to-date statistics
+// 	}
+
+// 	if err := pprof.WriteHeapProfile(fm); err != nil {
+// 		log.Fatal("could not write memory profile: ", err)
+// 	}
+
+// 	return fm
+// }
+
+func GenerateAllThumbnails(numberOfWorkers int) error {
+	// fc := cpuProfile()
+	// defer fc.Close()
+	// defer pprof.StopCPUProfile()
 	minioClient, err := MinioClientFromEnv()
 	if err != nil {
 		return err
@@ -44,6 +76,9 @@ func GenerateAllThumbnails() error {
 
 	wg.Wait()
 
+	// fm := memProfile(false)
+	// defer fm.Close()
+
 	return nil
 }
 
@@ -64,17 +99,19 @@ func worker(id int, wg *sync.WaitGroup, minioClient *minio.Client, queue <-chan 
 
 		stat, err := object.Stat()
 		if err == nil {
-			logrus.Infof("[skip] <%d> %s", id, stat.Key)
+			logrus.Debugf("[skip] <%d> %s", id, stat.Key)
 
 			continue
 		}
 
+		object.Close()
+
 		_, stat = ThumbnailOrOriginal(ctx, minioClient, path, thumbnailPath)
 
-		logrus.Infof("[done] <%d> %s", id, stat.Key)
+		logrus.Debugf("[done] <%d> %s", id, stat.Key)
 	}
 
-	logrus.Info("Done")
+	logrus.Debugf("<%d> I'm done")
 
 	wg.Done()
 }
@@ -90,12 +127,14 @@ func ThumbnailOrOriginal(ctx context.Context, minioClient *minio.Client, path, t
 		return original, minio.ObjectInfo{}
 	}
 
-	thumb := generateThumbnail(original)
+	thumb, size := generateThumbnail(original)
 	if thumb == nil {
 		return original, stat
 	}
 
-	_, err = minioClient.PutObject(ctx, BucketNameFromEnv(), thumbnailPath, thumb, -1, minio.PutObjectOptions{})
+	_, err = minioClient.PutObject(ctx, BucketNameFromEnv(), thumbnailPath, thumb, size, minio.PutObjectOptions{
+		ContentType: "image/jpeg",
+	})
 	if err != nil {
 		return original, stat
 	}
@@ -110,20 +149,20 @@ func ThumbnailOrOriginal(ctx context.Context, minioClient *minio.Client, path, t
 	return thumbnailObject, stat
 }
 
-func generateThumbnail(content io.Reader) io.Reader {
+func generateThumbnail(content io.Reader) (io.Reader, int64) {
 	originalImage, _, err := image.Decode(content)
 	if err != nil {
-		return nil
+		return nil, 0
 	}
 
-	newImage := resize.Thumbnail(ThumbnailSize, ThumbnailSize, originalImage, resize.Lanczos3)
+	newImage := resize.Thumbnail(ThumbnailSize, ThumbnailSize, originalImage, resize.NearestNeighbor)
 
 	var b bytes.Buffer
 
 	err = jpeg.Encode(&b, newImage, nil)
 	if err != nil {
-		return nil
+		return nil, 0
 	}
 
-	return &b
+	return &b, int64(b.Len())
 }

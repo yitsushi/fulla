@@ -14,3 +14,15 @@ FULLA_NOSSL             -> if it's not empty, use http, otherwise use https
 FULLA_LOGIN_SECRET      -> secret for login
   If not provided, the system will generate one (not persistent)
 ```
+
+## Start server
+
+```
+fulla serve --listen="0.0.0.0:9876" [--debug]
+```
+
+## Generate thumbnails
+
+```
+fulla thumbnail --workers=4 [--debug]
+```

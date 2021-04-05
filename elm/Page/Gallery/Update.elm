@@ -20,7 +20,7 @@ update msg global model =
                     ( { model | objectList = Just list }, Cmd.none )
 
                 _ ->
-                    ( { model | error = Just "something went wrong" }, Cmd.none )
+                    ( { model | objectList = Nothing, error = Just "something went wrong" }, Cmd.none )
 
         Base.Gallery (Page.Gallery.Message.Enlarge path) ->
             ( { model | enlarge = Just path }, Cmd.none )
@@ -52,6 +52,8 @@ update msg global model =
                     in
                     ( newModel, Request.objectsOnPath global.global.jwtToken newModel <| Request.wrapMsg Page.Gallery.Message.ObjectListArrived )
 
+                App.Route.Gallery Page.Gallery.Route.Root ->
+                    ( model, Request.objectsOnPath global.global.jwtToken model <| Request.wrapMsg Page.Gallery.Message.ObjectListArrived )
                 _ ->
                     ( model, Cmd.none )
 

@@ -12,10 +12,6 @@ import (
 	"gitea.code-infection.com/efertone/fulla/storage"
 )
 
-const (
-	thumbnailSize = 1024
-)
-
 func getObject(c *fiber.Ctx) error {
 	minioClient, err := storage.MinioClientFromEnv()
 	if err != nil {
@@ -55,7 +51,7 @@ func getThumbnail(c *fiber.Ctx) error {
 
 	var objectInfo minio.ObjectInfo
 
-	_, err = object.Stat()
+	objectInfo, err = object.Stat()
 	if err != nil {
 		object, objectInfo = storage.ThumbnailOrOriginal(ctx, minioClient, path, thumbnailPath)
 	}

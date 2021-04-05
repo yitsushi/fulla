@@ -91,6 +91,12 @@ viewFile file =
             , Html.Events.onClick <| gEvent <| Page.Gallery.Message.Enlarge file.key
             ]
             []
+        , Html.img
+            [ Html.Attributes.src <| "/api/get/" ++ file.key
+            , Html.Attributes.alt <| "prefetch-" ++ name
+            , Html.Attributes.style "display" "none"
+            ]
+            []
         , Html.text name
         ]
 
